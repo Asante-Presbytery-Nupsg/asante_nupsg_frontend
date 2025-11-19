@@ -7,7 +7,7 @@ const HeroSection = () => {
         {/* inner container */}
         <div className="w-[70%] mx-auto  h-full">
           {/* header text */}
-          <div className="text-8xl text-blue-900 font-bold text-center pt-12 pb-4">
+          <div className="text-8xl text-blue-900 font-semibold text-center pt-12 pb-4">
             <p>
               <span>Welcome to the NUPS-G</span>
             </p>
