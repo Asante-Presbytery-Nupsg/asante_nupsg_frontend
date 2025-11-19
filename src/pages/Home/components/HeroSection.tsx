@@ -39,11 +39,17 @@ const HeroSection = () => {
             {/* images */}
             <div className="w-full flex justify-between items-end gap-2 ">
               {/* image-1 */}
-              <div className="w-[33%] h-[55vh] rounded-[85px] bg-slate-300"></div>
+              <div className="w-[33%] h-[55vh] rounded-[85px] bg-slate-300  relative  overflow-hidden">
+                <div className="absolute inset-0 image-gradient"></div>
+              </div>
               {/* image-2 */}
-              <div className="w-[33%] h-[50vh] rounded-[85px] bg-slate-300"></div>
+              <div className="w-[33%] h-[50vh] rounded-[85px] bg-slate-300  relative  overflow-hidden">
+                <div className="absolute inset-0 image-gradient"></div>
+              </div>
               {/* image-3 */}
-              <div className="w-[33%] h-[55vh] rounded-[85px] bg-slate-300"></div>
+              <div className="w-[33%] h-[55vh] rounded-[85px] bg-slate-300  relative  overflow-hidden">
+                <div className="absolute inset-0 image-gradient"></div>
+              </div>
             </div>
           </div>
         </div>

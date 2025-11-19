@@ -1,12 +1,19 @@
 import Footer from "../components/Footer"
+import Navbar from "../components/Navbar"
+import GetStarted from "./components/GetStarted"
 import HeroSection from "./components/HeroSection"
-import WhoCanRegisterSection from "./components/WhoCanRegisterSection"
+import HowItWorksSection from "./components/HowItWorks"
+import RegisterInfoSection from "./components/RegisterInfoSection"
+
 
 const Home = () => {
   return (
     <div className="font-body">
+      <Navbar/>
           <HeroSection />
-      <WhoCanRegisterSection />
+      <RegisterInfoSection />
+      <HowItWorksSection />
+      <GetStarted/>
       <Footer/>
     </div>
   )
