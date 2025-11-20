@@ -1,5 +1,6 @@
 import Footer from "../components/Footer"
 import Navbar from "../components/Navbar"
+import FormOne from "../Forms/FormOne"
 import GetStarted from "./components/GetStarted"
 import HeroSection from "./components/HeroSection"
 import HowItWorksSection from "./components/HowItWorks"
@@ -13,7 +14,11 @@ const Home = () => {
           <HeroSection />
       <RegisterInfoSection />
       <HowItWorksSection />
-      <GetStarted/>
+      <GetStarted />
+      {/* forms */}
+      <div className="">
+        <FormOne/>
+      </div>
       <Footer/>
     </div>
   )

@@ -4,6 +4,8 @@ import Login from "./auth/Login";
 import Layout from "./components/dashboard/Layouts";
 import Dashboard from "./dashboard/dashboard";
 import Home from "./pages/Home/Home";
+
+
 function App() {
   return (
     <>
@@ -12,9 +14,12 @@ function App() {
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Layout />}>
+          <Route path="/dashboard" element={<Layout />}>
+            {/* demo */}
+            
               <Route index element={<Dashboard />} />
-            </Route>
+          </Route>
+          
           </Routes>
         </BrowserRouter>
       {/* </ThemeProvider> */}
