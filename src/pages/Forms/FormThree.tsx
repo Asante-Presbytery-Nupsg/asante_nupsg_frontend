@@ -1,154 +1,165 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-type FormData = {
-  firstName: string;
-  lastName: string;
-  otherNames: string;
-  dob: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
+type ChurchData = {
+  congregation: string;
+  region: string;
+  district: string;
+  presbytery: string;
+  guardianName: string;
+  guardianContact: string;
 };
 
-const FormOne: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    otherNames: "",
-    dob: "",
-    phone: "",
-    whatsapp: "",
-    email: "",
+const FormThree: React.FC = () => {
+  const [formData, setFormData] = useState<ChurchData>({
+    congregation: "",
+    region: "",
+    district: "",
+    presbytery: "",
+    guardianName: "",
+    guardianContact: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleNext = () => {
-    console.log("Form Data:", formData);
+  const handleFinish = () => {
+    console.log("Final submission:", formData);
+  };
+
+  const handleBack = () => {
+    console.log("Go back to previous step");
   };
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
-      {/* Title */}
       <h2 className="text-3xl font-bold text-blue-700 mb-2 text-center">
         Register as a member
       </h2>
-      <p className="text-gray-600 text-center mb-6">Personal Information</p>
+      <p className="text-gray-600 text-center mb-6">Church & Family Details</p>
 
-      {/* Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            First Name
+            Local Congregation
           </label>
           <input
             type="text"
-            name="firstName"
-            value={formData.firstName}
+            name="congregation"
+            value={formData.congregation}
             onChange={handleChange}
-            placeholder="Enter first name"
+            placeholder="Enter your local congregation"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Last Name
+            Church Region
+          </label>
+          <select
+            name="region"
+            value={formData.region}
+            onChange={handleChange}
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">---Select region---</option>
+            <option value="Greater Accra">Greater Accra</option>
+            <option value="Ashanti">Ashanti</option>
+            <option value="Central">Central</option>
+            <option value="Volta">Volta</option>
+            <option value="Northern">Northern</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Church District
           </label>
           <input
             type="text"
-            name="lastName"
-            value={formData.lastName}
+            name="district"
+            value={formData.district}
             onChange={handleChange}
-            placeholder="Enter last name"
+            placeholder="Enter church district"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Other Name(s)
+            Presbytery Name
           </label>
           <input
             type="text"
-            name="otherNames"
-            value={formData.otherNames}
+            name="presbytery"
+            value={formData.presbytery}
             onChange={handleChange}
-            placeholder="Enter other name(s)"
+            placeholder="Enter presbytery name"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Date of Birth
+            Guardian/Parent Name
           </label>
           <input
             type="text"
-            name="dob"
-            value={formData.dob}
+            name="guardianName"
+            value={formData.guardianName}
             onChange={handleChange}
-            placeholder="DD/MM/YYYY"
+            placeholder="Enter guardian/parent name"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Phone Number
+            Guardian/Parent's Contact
           </label>
           <input
             type="text"
-            name="phone"
-            value={formData.phone}
+            name="guardianContact"
+            value={formData.guardianContact}
             onChange={handleChange}
-            placeholder="Enter phone number"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            WhatsApp Number
-          </label>
-          <input
-            type="text"
-            name="whatsapp"
-            value={formData.whatsapp}
-            onChange={handleChange}
-            placeholder="Enter WhatsApp number"
+            placeholder="Enter guardian/parent's contact"
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>
 
-      {/* Email full width */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700">
-          Email Address (Optional)
-        </label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter email address"
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
+      <div className="mt-8 flex justify-between">
+        <button
+          onClick={handleBack}
+          className="inline-flex items-center px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition"
+        >
+          <svg
+            className="mr-2 h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back
+        </button>
 
-      {/* Next Button */}
-      <div className="mt-8 text-right">
-        <Link to="/formtwo">
+        <Link to="/">
           <button
-            onClick={handleNext}
+            onClick={handleFinish}
             className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
           >
-            Next
+            Finish
             <svg
               className="ml-2 h-5 w-5"
               fill="none"
@@ -163,11 +174,10 @@ const FormOne: React.FC = () => {
               />
             </svg>
           </button>
-        
         </Link>
       </div>
     </div>
   );
 };
 
-export default FormOne;
+export default FormThree;

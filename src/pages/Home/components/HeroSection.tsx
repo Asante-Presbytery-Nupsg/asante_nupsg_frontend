@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -32,9 +33,12 @@ const HeroSection = () => {
           <div className="w-full flex justify-center flex-col py-2    items-center">
             {/* button */}
             <div className=" pt-12">
-              <button className="bg-blue-700 p-4 text-white rounded-2xl">
-                Register Now
-              </button>
+              <Link to="/formone">
+               
+                <button className="bg-blue-700 p-4 text-white rounded-2xl">
+                  Register Now
+                </button>
+              </Link>
             </div>
             {/* images */}
             <div className="w-full flex justify-between items-end gap-2 ">

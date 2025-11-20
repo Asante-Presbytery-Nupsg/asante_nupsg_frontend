@@ -1,30 +1,33 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./auth/Login";
-// import { ThemeProvider } from "./contexts/ThemeProvider";
-import Layout from "./components/dashboard/Layouts";
-import Dashboard from "./dashboard/dashboard";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+
+import Layout from "./pages/layout/Layout";
 import Home from "./pages/Home/Home";
-
-
+import FormOne from "./pages/Forms/FormOne";
+import FormTwo from "./pages/Forms/FormTwo";
+import FormThree from "./pages/Forms/FormThree";
 function App() {
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="formone" element={<FormOne />} />
+        <Route path="formtwo" element={<FormTwo/>} />
+        <Route path="formthree" element={<FormThree/>} />
+      </Route>
+    )
+  );
+
   return (
     <>
-      {/* <ThemeProvider defaultTheme="" storageKey="vite-ui-theme"> */}
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home/>} />
-            <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Layout />}>
-            {/* demo */}
-            
-              <Route index element={<Dashboard />} />
-          </Route>
-          
-          </Routes>
-        </BrowserRouter>
-      {/* </ThemeProvider> */}
+      <RouterProvider router={router} />
     </>
   );
 }
 
 export default App;
+
