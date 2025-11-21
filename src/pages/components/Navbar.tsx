@@ -1,3 +1,5 @@
+import logo from "../../assets/NUPSGLOGO.svg";
+
 const Navbar = () => {
   return (
     <>
@@ -6,17 +8,20 @@ const Navbar = () => {
         {/* inner container */}
         <div className="w-[70%] mx-auto flex justify-between items-center">
           {/* logo (placeholder gray box) */}
-          <div className="w-14 h-14 bg-slate-300 rounded-md"></div>
+          {/* <div className="w-14 h-14 bg-slate-300 rounded-md"></div> */}
+          <div className="">
+            <img src={logo} alt="logo" />
+          </div>
 
           {/* buttons */}
           <div className="flex items-center gap-4">
             {/* About Us button */}
-            <button className="px-6 py-2 border border-blue-900 text-blue-900 rounded-xl">
+            <button className="px-8  py-4 border border-blue-900 text-blue-900 rounded-2xl">
               About Us
             </button>
 
             {/* Our Socials button (filled) */}
-            <button className="px-6 py-2 bg-blue-900 text-white rounded-xl">
+            <button className="px-8 py-4 bg-blue-900 text-white rounded-2xl">
               Our socials
             </button>
           </div>
