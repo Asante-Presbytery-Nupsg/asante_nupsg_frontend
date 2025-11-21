@@ -1,47 +1,47 @@
 import React from "react";
-// import { FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
+import { FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
+import logo from '../../assets/NUPSGLOGOFooter.svg'
 
 const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-gray-100 text-gray-700 pt-20 pb-6 px-6 md:px-20 overflow-hidden">
-      {/* Gradient NUPS-G background text */}
-      <div className="absolute inset-0 flex justify-center items-end pointer-events-none">
-        <h1 className="text-[8rem] md:text-[12rem] font-extrabold text-transparent bg-gradient-to-t from-gray-300 to-transparent bg-clip-text opacity-30 leading-none select-none">
-          NUPS-G
-        </h1>
-      </div>
-
-      {/* Main content */}
-      <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-        {/* Logo and Name */}
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-gray-400 rounded-md" />
-          <div>
-            <h3 className="text-lg font-semibold leading-snug">
-              National Union of Presbyterian Students – Ghana
-            </h3>
+    <footer className="relative flex justify-center h-[55vh] bg-[#C6CDD9] text-gray-700 pt-20 pb-6 px-6 md:px-20 overflow-hidden">
+      {/* inner */}
+      <div className="w-[50%]">
+        {/* Main content */}
+        <div className="relative z-10  mx-auto flex justify-between">
+          {/* Logo and Name */}
+          <div className="flex w-[35%] items-start gap-4">
+            <div className="w-1/2">
+              <img src={logo} alt="" />
+            </div>
+            <div>
+              <h3 className="text-2xl  leading-snug">
+                National Union of Presbyterian Students – Ghana
+              </h3>
+            </div>
           </div>
-        </div>
 
-        {/* Contact Info */}
-        <div>
-          <h4 className="text-md font-semibold mb-2">Reach us</h4>
-          <p className="text-sm">Kumasi, Ghana</p>
-          <p className="text-sm">Email: info@nupsg.org</p>
-        </div>
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-xl font-semibold mb-2">Reach us</h4>
+            <p className="text-sm">Kumasi, Ghana</p>
+            <p className="text-sm">Email: info@nupsg.org</p>
+          </div>
 
-        {/* Quick Links and Socials */}
-        <div>
-          <h4 className="text-md font-semibold mb-2">Quick links</h4>
-          <ul className="text-sm  mb-4">
-            <li>
-              <a href="/about" className="hover:underline">
-                About us
-              </a>
-            </li>
-          </ul>
-          <div className="flex gap-4 text-blue-600 text-xl">
-            {/* <a href="https://facebook.com" aria-label="Facebook">
+          {/* Quick Links and Socials */}
+          <div>
+            <h4 className="text-xl font-semibold mb-2">Quick links</h4>
+            <ul className="text-sm  mb-4">
+              <li>
+                <a href="/about" className="hover:underline">
+                  About us
+                </a>
+              </li>
+            </ul>
+          </div>
+          {/* socials */}
+          <div className="flex gap-4 text-[#242626] text-xl">
+            <a href="https://facebook.com" aria-label="Facebook" className="">
               <FaFacebookF />
             </a>
             <a href="https://linkedin.com" aria-label="LinkedIn">
@@ -49,14 +49,21 @@ const Footer: React.FC = () => {
             </a>
             <a href="https://youtube.com" aria-label="YouTube">
               <FaYoutube />
-            </a> */}
+            </a>
           </div>
         </div>
-      </div>
 
-      {/* Copyright */}
-      <div className="relative z-10 mt-10 text-center text-sm text-gray-500">
-        © 2025 NUPS-G All Rights Reserved.
+        {/* gradient text */}
+        <div className="absolute inset-0 flex justify-center items-end pointer-events-none">
+          <h1 className="text-[8rem] md:text-[270px] font-extrabold text-transparent bg-gradient-to-b from-[#002A6E] to-[#C6CDD9] bg-clip-text opacity-30 leading-none select-none">
+            NUPS-G
+          </h1>
+        </div>
+
+        {/* Copyright */}
+        <div className="absolute  text-center block bottom-1 mt-10 w-[50%] text-sm text-gray-500">
+          <div className="">© 2025 NUPS-G All Rights Reserved.</div>
+        </div>
       </div>
     </footer>
   );
