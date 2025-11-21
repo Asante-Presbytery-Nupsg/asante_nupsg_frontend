@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import PageIndicator from "./Components/PageIndicator";
 
 type EducationData = {
   program: string;
@@ -16,6 +17,8 @@ const FormTwo: React.FC = () => {
     highSchool: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -25,19 +28,30 @@ const FormTwo: React.FC = () => {
 
   const handleNext = () => {
     console.log("Next step:", formData);
+    // navigation handled by Link below
   };
 
   const handleBack = () => {
     console.log("Go back");
+    navigate("/formone"); // navigate back to FormOne
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-blue-700 mb-2 text-center">
+    <div className="max-w-2xl my-20 mx-auto  p-8 bg-white rounded-lg shadow-lg">
+      {/* Title */}
+      <h2 className="text-6xl font-bold text-[#002A6E] text-center mb-2">
         Register as a member
       </h2>
-      <p className="text-gray-600 text-center mb-6">Educational Background</p>
+      <p className="text-gray-600 text-4xl text-center mb-4">
+        Educational Background
+      </p>
 
+      {/* Page Indicator — placed below titles */}
+      <div className="flex justify-center mb-6">
+        <PageIndicator currentStep={1} totalSteps={3} />
+      </div>
+
+      {/* Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -100,6 +114,7 @@ const FormTwo: React.FC = () => {
         </div>
       </div>
 
+      {/* Navigation Buttons */}
       <div className="mt-8 flex justify-between">
         <button
           onClick={handleBack}
@@ -141,8 +156,7 @@ const FormTwo: React.FC = () => {
               />
             </svg>
           </button>
-              </Link>
-             
+        </Link>
       </div>
     </div>
   );

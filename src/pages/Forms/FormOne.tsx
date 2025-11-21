@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import PageIndicator from "./Components/PageIndicator";
+import InputField from "./Components/InputField";
 
 type FormData = {
   firstName: string;
@@ -32,140 +34,101 @@ const FormOne: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
+    <div className="max-w-3xl mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
       {/* Title */}
-      <h2 className="text-3xl font-bold text-blue-700 mb-2 text-center">
+      <h2 className="text-6xl font-bold text-[#002A6E] text-center mb-2">
         Register as a member
       </h2>
-      <p className="text-gray-600 text-center mb-6">Personal Information</p>
+      <p className="text-gray-600 text-4xl text-center mb-4">Personal Information</p>
+
+      {/* Page Indicator */}
+      <div className="flex justify-center mb-6">
+        <PageIndicator currentStep={0} totalSteps={3} />
+      </div>
 
       {/* Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            type="text"
+      <form className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputField
+            label="First Name"
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             placeholder="Enter first name"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            type="text"
+          <InputField
+            label="Last Name"
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
             placeholder="Enter last name"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Other Name(s)
-          </label>
-          <input
-            type="text"
+          <InputField
+            label="Other Name(s)"
             name="otherNames"
             value={formData.otherNames}
             onChange={handleChange}
             placeholder="Enter other name(s)"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Date of Birth
-          </label>
-          <input
-            type="text"
+          <InputField
+            label="Date of Birth"
             name="dob"
             value={formData.dob}
             onChange={handleChange}
             placeholder="DD/MM/YYYY"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Phone Number
-          </label>
-          <input
-            type="text"
+          <InputField
+            label="Phone Number"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             placeholder="Enter phone number"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            WhatsApp Number
-          </label>
-          <input
-            type="text"
+          <InputField
+            label="WhatsApp Number"
             name="whatsapp"
             value={formData.whatsapp}
             onChange={handleChange}
             placeholder="Enter WhatsApp number"
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-      </div>
 
-      {/* Email full width */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700">
-          Email Address (Optional)
-        </label>
-        <input
-          type="email"
+        {/* Email full width */}
+        <InputField
+          label="Email Address (Optional)"
           name="email"
           value={formData.email}
           onChange={handleChange}
           placeholder="Enter email address"
-          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          type="email"
         />
-      </div>
 
-      {/* Next Button */}
-      <div className="mt-8 text-right">
-        <Link to="/formtwo">
-          <button
-            onClick={handleNext}
-            className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
-          >
-            Next
-            <svg
-              className="ml-2 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
+        {/* Next Button */}
+        <div className="text-right pt-4">
+          <Link to="/formtwo">
+            <button
+              type="button"
+              onClick={handleNext}
+              className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        
-        </Link>
-      </div>
+              Next
+              <svg
+                className="ml-2 h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </Link>
+        </div>
+      </form>
     </div>
   );
 };

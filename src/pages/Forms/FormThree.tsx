@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import PageIndicator from "./Components/PageIndicator";
 
 type ChurchData = {
   congregation: string;
@@ -20,6 +21,8 @@ const FormThree: React.FC = () => {
     guardianContact: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -29,19 +32,30 @@ const FormThree: React.FC = () => {
 
   const handleFinish = () => {
     console.log("Final submission:", formData);
+    // navigation handled by Link below
   };
 
   const handleBack = () => {
     console.log("Go back to previous step");
+    navigate("/formtwo"); // navigate back to FormTwo
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold text-blue-700 mb-2 text-center">
+    <div className="max-w-2xl mx-auto my-20 p-8 bg-white rounded-lg shadow-lg">
+      {/* Title */}
+      <h2 className="text-6xl font-bold text-[#002A6E] text-center mb-2">
         Register as a member
       </h2>
-      <p className="text-gray-600 text-center mb-6">Church & Family Details</p>
+      <p className="text-gray-600 text-4xl text-center mb-4">
+        Church & Family Details
+      </p>
 
+      {/* Page Indicator — placed below titles */}
+      <div className="flex justify-center mb-6">
+        <PageIndicator currentStep={2} totalSteps={3} />
+      </div>
+
+      {/* Form Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -133,6 +147,7 @@ const FormThree: React.FC = () => {
         </div>
       </div>
 
+      {/* Navigation Buttons */}
       <div className="mt-8 flex justify-between">
         <button
           onClick={handleBack}
@@ -154,7 +169,7 @@ const FormThree: React.FC = () => {
           Back
         </button>
 
-        <Link to="/">
+        <Link to="/success">
           <button
             onClick={handleFinish}
             className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
