@@ -19,7 +19,7 @@ function App() {
         <Route path="formone" element={<FormOne />} />
         <Route path="formtwo" element={<FormTwo />} />
         <Route path="formthree" element={<FormThree />} />
-        <Route path="/success" element={<SuccessPage/>} />
+        <Route path="/success" element={<SuccessPage />} />
       </Route>
     )
   );
@@ -32,4 +32,3 @@ function App() {
 }
 
 export default App;
-
