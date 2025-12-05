@@ -41,11 +41,6 @@ const SuccessPage: React.FC = () => {
             </button>
           </Link>
 
-          <Link to="/formone">
-            <button className="w-full px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition">
-              Register Another Member
-            </button>
-          </Link>
         </div>
       </div>
     </div>
