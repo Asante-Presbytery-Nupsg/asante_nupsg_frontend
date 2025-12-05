@@ -5,7 +5,7 @@ const RegisterInfoSection = () => {
   return (
     <>
       {/* outer container */}
-      <div className="w-full bg-slate-50 py-16 md:py-20">
+      <div className="w-full bg-slate-50 py-20 md:py-32">
         {/* inner container */}
         <div className="w-full md:w-[80%] lg:w-[70%] mx-auto flex flex-col md:flex-row items-center justify-between gap-10 px-4">
           {/* images container */}
@@ -31,7 +31,7 @@ const RegisterInfoSection = () => {
 
           {/* text content */}
           <div className="w-full md:w-[50%]">
-            <p className="text-slate-600 text-xl sm:text-2xl md:text-3xl leading-relaxed">
+            <p className="text-slate-600 text-xl sm:text-2xl md:text-3xl leading-tight tracking-wide">
               This platform has been designed to help you connect with the union
               on your campus and become part of a growing family of believers
               who are passionate about spiritual growth, service, and
@@ -41,7 +41,7 @@ const RegisterInfoSection = () => {
         </div>
 
         {/* Who Can Register Section */}
-        <div className="w-full bg-blue-900 text-white mt-16 md:mt-20 py-12 md:py-16">
+        <div className="w-full bg-blue-900 text-white mt-16 md:mt-20 py-12 md:py-20">
           <div className="w-full md:w-[70%] lg:w-[50%] mx-auto text-center px-4">
             <p className="text-4xl sm:text-5xl md:text-6xl font-semibold text-[#C7DCFF] pb-6">
               Who Can Register?

@@ -1,85 +1,96 @@
 import { useState, useRef, useEffect } from "react";
 import logo from "../../assets/NUPSGLOGO.svg";
 import { Link } from "react-router-dom";
+import { Menu } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Navbar: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
 
-  // ref for the dropdown container
+  // refs for the dropdown container and hamburger button
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
+  // Close dropdown when clicking outside, excluding the button
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-
-      if (menuRef.current && !menuRef.current.contains(target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
       document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   return (
     <>
-      <div className="w-full bg-slate-50 h-[12vh] flex items-center">
+      <div className="w-full bg-slate-50 py-4 border-b flex items-center">
         <div className="w-[90%] md:w-[70%] mx-auto flex justify-between items-center">
-          {/* Logo with controlled responsive sizing */}
+          {/* Logo */}
           <div>
             <Link to="/">
               <img
                 src={logo}
                 alt="logo"
-                className="w-10 sm:w-12 md:w-14 lg:w-16 object-contain"
+                className="w-8 sm:w-10 object-contain"
               />
             </Link>
           </div>
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-4">
-            <button className="px-8 py-3 border border-blue-900 text-blue-900 rounded-2xl">
+            <button className="px-6 py-2.5 border border-blue-900 text-blue-900 rounded-2xl">
               About Us
             </button>
-
-            <button className="px-8 py-3 bg-blue-900 text-white rounded-2xl">
+            <button className="px-6 py-2.5 bg-blue-900 text-white rounded-2xl">
               Our socials
             </button>
           </div>
 
           {/* Mobile Hamburger */}
           <div className="md:hidden">
-            <button onClick={() => setOpen((prev) => !prev)}>
-              <div className="space-y-1">
-                <div className="w-6 h-1 bg-blue-900"></div>
-                <div className="w-6 h-1 bg-blue-900"></div>
-                <div className="w-6 h-1 bg-blue-900"></div>
-              </div>
+            <button ref={buttonRef} onClick={() => setOpen((prev) => !prev)}>
+              <Menu size={24} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Dropdown */}
-      {open && (
-        <div
-          ref={menuRef}
-          className="md:hidden w-full bg-slate-50 px-6 pb-4 space-y-3 shadow-sm"
-        >
-          <Link to="https://nupsgknust.org/about">
-            <button className="w-full px-6 py-3 border border-blue-900 text-blue-900 rounded-2xl">
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+            ref={menuRef}
+            className="md:hidden w-full bg-slate-50/20 backdrop-blur-md p-8 space-y-3 shadow-sm absolute top-16 left-0 z-50"
+          >
+            <Link
+              to="https://nupsgknust.org/about"
+              className="w-full px-6 py-3 border border-blue-900 text-blue-900 rounded-2xl inline-block text-center"
+            >
               About Us
-            </button>
-          </Link>
+            </Link>
 
-          <button className="w-full px-6 py-3 bg-blue-900 text-white rounded-2xl">
-            Our socials
-          </button>
-        </div>
-      )}
+            <button className="w-full px-6 py-3 bg-blue-900 text-white rounded-2xl">
+              Our socials
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
