@@ -1,14 +1,19 @@
 import React, { useState } from "react";
-import { useForm, type FieldError, type SubmitHandler } from "react-hook-form";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputField from "./Components/InputField";
-import PageIndicator from "./Components/PageIndicator";
+import { useQuery } from "@tanstack/react-query";
+import InputField from "./partials/InputField";
+import PageIndicator from "./partials/PageIndicator";
 import {
   MultiStepUserSchema,
   type MultiStepUserFormInput,
 } from "@/schema/userSchema";
 import SuccessPage from "./SuccessModal";
 import { registerUser } from "@/api/auth.api";
+import { getInstitutions, getProgrammes, getRegions } from "@/api/misc.api";
+import { Combobox } from "@/components/shared/combobox";
+import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/shared/date_of_birth";
 
 // Fields per step
 const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
@@ -21,10 +26,10 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
     "whatsapp",
     "dob",
   ],
-  ["programme", "institution", "district_institution", "high_school"],
+  ["programme_id", "institution_id", "district_institution", "high_school"],
   [
     "congregation",
-    "region",
+    "region_id",
     "district_church",
     "presbytery",
     "guardian_name",
@@ -33,18 +38,95 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
 ];
 
 const MultiStepForm: React.FC = () => {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [programmeSearch, setProgrammeSearch] = useState("");
+  const [institutionSearch, setInstitutionSearch] = useState("");
+  const [regionSearch, setRegionSearch] = useState("");
 
   const {
     register,
     handleSubmit,
     trigger,
+    watch,
+    control,
+    setValue,
     formState: { errors },
   } = useForm<MultiStepUserFormInput>({
     resolver: zodResolver(MultiStepUserSchema),
     mode: "onBlur",
+    defaultValues: {
+      dob: undefined,
+      programme_id: "",
+      institution_id: "",
+      region_id: "",
+    },
   });
+
+  const programmeValue = watch("programme_id");
+  const institutionValue = watch("institution_id");
+  const regionValue = watch("region_id");
+
+  // Fetch initial programmes (loads 30 upfront)
+  const { data: programmesData, isLoading: isLoadingProgrammes } = useQuery({
+    queryKey: ["programmes", programmeSearch],
+    queryFn: () =>
+      getProgrammes({
+        pageIndex: 0,
+        pageSize: 30,
+        globalFilter: programmeSearch,
+      }),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+  });
+
+  // Fetch initial institutions (loads 30 upfront)
+  const { data: institutionsData, isLoading: isLoadingInstitutions } = useQuery(
+    {
+      queryKey: ["institutions", institutionSearch],
+      queryFn: () =>
+        getInstitutions({
+          pageIndex: 0,
+          pageSize: 30,
+          globalFilter: institutionSearch,
+        }),
+      staleTime: 5 * 60 * 1000,
+      placeholderData: (previousData) => previousData,
+    }
+  );
+
+  const { data: regionsData, isLoading: isLoadingRegions } = useQuery({
+    queryKey: ["regions"],
+    queryFn: () =>
+      getRegions({ pageIndex: 0, pageSize: 30, globalFilter: regionSearch }),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+  });
+
+  // Transform API data to combobox format
+  const programmeOptions = React.useMemo(() => {
+    if (!programmesData?.programmes) return [];
+    return programmesData.programmes.map((prog) => ({
+      value: prog.id?.toString() || prog.name,
+      label: prog.name,
+    }));
+  }, [programmesData]);
+
+  const institutionOptions = React.useMemo(() => {
+    if (!institutionsData?.institutions) return [];
+    return institutionsData.institutions.map((institution) => ({
+      value: institution.id?.toString() || institution.name,
+      label: institution.name,
+    }));
+  }, [institutionsData]);
+
+  const regionOptions = React.useMemo(() => {
+    if (!regionsData?.regions) return [];
+    return regionsData.regions.map((region) => ({
+      value: region.id?.toString() || region.name,
+      label: region.name,
+    }));
+  }, [regionsData]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,14 +139,10 @@ const MultiStepForm: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<MultiStepUserFormInput> = async (data) => {
-    // console.log("Final submission:", data);
-
-    // Trim email safely
     data.email = data.email?.trim();
 
     try {
       const response = await registerUser(data);
-      // console.log("API Response:", response);
       if (response) {
         setShowSuccessModal(true);
       }
@@ -75,7 +153,7 @@ const MultiStepForm: React.FC = () => {
 
   return (
     <div className="p-4">
-      <div className="max-w-3xl mx-auto my-14 md:my-20 py-12 px-5 sm:py-8 sm:px-8 bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="max-w-2xl mx-auto my-14 md:my-20 py-12 px-5 sm:py-8 sm:px-8 bg-white rounded-lg shadow-sm border border-gray-200">
         {showSuccessModal && <SuccessPage isVisible={showSuccessModal} />}
 
         <h2 className="text-3xl md:text-4xl font-bold text-[#002A6E] text-center mb-2">
@@ -95,58 +173,75 @@ const MultiStepForm: React.FC = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {step === 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-5">
+              <Input
                 label="First Name"
-                name="first_name"
-                register={register}
+                register={register("first_name", {
+                  required: "First name is required",
+                })}
                 error={errors.first_name}
                 placeholder="Enter first name"
+                className="h-10"
               />
-              <InputField
+
+              <Input
                 label="Last Name"
-                name="last_name"
-                register={register}
+                register={register("last_name", {
+                  required: "Last name is required",
+                })}
                 error={errors.last_name}
                 placeholder="Enter last name"
+                className="h-10"
               />
-              <InputField
+
+              <Input
                 label="Other Name(s)"
-                name="other_name"
-                register={register}
+                register={register("other_name")}
                 error={errors.other_name}
                 placeholder="Enter other names"
+                className="h-10"
               />
-              <InputField
-                label="Date of Birth"
-                name="dob"
-                register={register}
-                error={errors.dob as FieldError | undefined}
-                placeholder="DD/MM/YYYY"
-                type="date"
-              />
-              <InputField
+
+              <Input
                 label="Phone Number"
-                name="phone"
-                register={register}
+                register={register("phone", {
+                  required: "Phone number is required",
+                })}
                 error={errors.phone}
                 placeholder="Enter phone number"
+                className="h-10"
               />
-              <InputField
-                label="WhatsApp Number"
-                name="whatsapp"
-                register={register}
+
+              <Controller
+                control={control}
+                name="dob"
+                rules={{ required: "Date of birth is required" }}
+                render={({ field }) => (
+                  <DatePicker
+                    label="Date of Birth"
+                    placeholder="Select your date of birth"
+                    value={field.value as Date | null}
+                    onChange={field.onChange}
+                    error={errors.dob}
+                  />
+                )}
+              />
+
+              <Input
+                label="WhatsApp Number(Optional)"
+                register={register("whatsapp")}
                 error={errors.whatsapp}
-                placeholder="Enter WhatsApp number"
+                placeholder="Enter whatsapp number"
+                className="h-10"
               />
+
               <div className="col-span-full">
-                <InputField
-                  label="Email Address (Optional)"
-                  name="email"
-                  register={register}
+                <Input
+                  label="Email Address (optional)"
+                  register={register("email")}
                   error={errors.email}
-                  placeholder="Enter email"
-                  type="email"
+                  placeholder="Enter email address"
+                  className="h-10"
                 />
               </div>
             </div>
@@ -154,33 +249,52 @@ const MultiStepForm: React.FC = () => {
 
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
-                label="Program of Study"
-                name="programme"
-                register={register}
-                error={errors.programme}
-                placeholder="Enter your program"
+              <Combobox
+                label="Programme"
+                value={programmeValue}
+                onChange={(val) =>
+                  setValue("programme_id", val, { shouldValidate: true })
+                }
+                options={programmeOptions}
+                placeholder="Select programme"
+                searchPlaceholder="Search programmes..."
+                error={errors.programme_id}
+                onSearch={setProgrammeSearch}
+                isLoading={isLoadingProgrammes}
               />
-              <InputField
-                label="Tertiary School Attending"
-                name="institution"
-                register={register}
-                error={errors.institution}
-                placeholder="Enter institution"
+
+              <Combobox
+                label="Tertiary School Attended"
+                value={institutionValue}
+                onChange={(val) =>
+                  setValue("institution_id", val, { shouldValidate: true })
+                }
+                options={institutionOptions}
+                placeholder="Select tertiary school"
+                searchPlaceholder="Search schools..."
+                error={errors.institution_id}
+                onSearch={setInstitutionSearch}
+                isLoading={isLoadingInstitutions}
               />
-              <InputField
+
+              <Input
                 label="District"
-                name="district_institution"
-                register={register}
+                register={register("district_institution", {
+                  required: "District is required",
+                })}
                 error={errors.district_institution}
                 placeholder="Enter district"
+                className="h-10"
               />
-              <InputField
+
+              <Input
                 label="High School Attended"
-                name="high_school"
-                register={register}
+                register={register("high_school", {
+                  required: "High school is required",
+                })}
                 error={errors.high_school}
                 placeholder="Enter high school attended"
+                className="h-10"
               />
             </div>
           )}
@@ -194,12 +308,19 @@ const MultiStepForm: React.FC = () => {
                 error={errors.congregation}
                 placeholder="Enter congregation"
               />
-              <InputField
+
+              <Combobox
                 label="Church Region"
-                name="region"
-                register={register}
-                error={errors.region}
-                placeholder="Enter region"
+                value={regionValue}
+                onChange={(val) =>
+                  setValue("region_id", val, { shouldValidate: true })
+                }
+                options={regionOptions}
+                placeholder="Select tertiary school"
+                searchPlaceholder="Search schools..."
+                error={errors.region_id}
+                onSearch={setRegionSearch}
+                isLoading={isLoadingRegions}
               />
               <InputField
                 label="Church District"

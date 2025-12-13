@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import logo from "../../assets/NUPSGLOGO.svg";
+import logo from "../assets/NUPSGLOGO.svg";
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";

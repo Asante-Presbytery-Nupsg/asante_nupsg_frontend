@@ -1,6 +1,6 @@
 import React from "react";
 import { FaFacebookF, FaLinkedinIn, FaYoutube } from "react-icons/fa";
-import logo from "../../assets/NUPSGLOGOFooter.svg";
+import logo from "../assets/NUPSGLOGO.svg";
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();

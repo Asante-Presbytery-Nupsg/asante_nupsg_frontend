@@ -8,7 +8,13 @@ import {
 import Layout from "./pages/layout/Layout";
 import Home from "./pages/Home/Home";
 import MultiStepForm from "./pages/Forms/MultiStepForm";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function App() {
+  const queryClient = new QueryClient({
+    defaultOptions: {},
+  });
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
@@ -20,7 +26,9 @@ function App() {
 
   return (
     <div className="font-body">
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </div>
   );
 }

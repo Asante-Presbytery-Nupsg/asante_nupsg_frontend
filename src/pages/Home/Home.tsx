@@ -1,7 +1,7 @@
-import GetStarted from "./components/GetStarted";
-import HeroSection from "./components/HeroSection";
-import HowItWorksSection from "./components/HowItWorks";
-import RegisterInfoSection from "./components/RegisterInfoSection";
+import GetStarted from "./partials/GetStarted";
+import HeroSection from "./partials/HeroSection";
+import HowItWorksSection from "./partials/HowItWorks";
+import RegisterInfoSection from "./partials/RegisterInfoSection";
 
 const Home = () => {
   return (

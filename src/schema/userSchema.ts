@@ -8,7 +8,7 @@ export const PersonalInfoSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   other_name: z.string().optional(),
 
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  email: z.email("Invalid email").optional().or(z.literal("")),
 
   phone: z.string().min(1, "Phone number is required"),
   whatsapp: z.string().optional(),
@@ -24,8 +24,8 @@ export const PersonalInfoSchema = z.object({
  * STEP 2 — Educational Background
  */
 export const EducationSchema = z.object({
-  programme: z.string().min(1, "Program is required"),
-  institution: z.string().min(1, "Institution is required"),
+  programme_id: z.string().min(1, "Program is required"),
+  institution_id: z.string().min(1, "Institution is required"),
   district_institution: z.string().min(1, "District is required"),
   high_school: z.string().min(1, "High school is required"),
 });
@@ -35,7 +35,7 @@ export const EducationSchema = z.object({
  */
 export const ChurchSchema = z.object({
   congregation: z.string().min(1, "Congregation is required"),
-  region: z.string().min(1, "Region is required"),
+  region_id: z.string().min(1, "Region is required"),
   district_church: z.string().min(1, "Church district is required"),
   presbytery: z.string().min(1, "Presbytery is required"),
   guardian_name: z.string().min(1, "Guardian name is required"),
@@ -45,8 +45,9 @@ export const ChurchSchema = z.object({
 /**
  * Combined schema for the entire multi-step form
  */
-export const MultiStepUserSchema =
-  PersonalInfoSchema.merge(EducationSchema).merge(ChurchSchema);
+export const MultiStepUserSchema = PersonalInfoSchema.extend(
+  EducationSchema.shape
+).extend(ChurchSchema.shape);
 
 /**
  * TYPES
