@@ -7,29 +7,30 @@ import {
 
 import Layout from "./pages/layout/Layout";
 import Home from "./pages/Home/Home";
-import FormOne from "./pages/Forms/FormOne";
-import FormTwo from "./pages/Forms/FormTwo";
-import FormThree from "./pages/Forms/FormThree";
-import SuccessPage from "./pages/Forms/SuccessPage";
+import MultiStepForm from "./pages/Forms/MultiStepForm";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 function App() {
+  const queryClient = new QueryClient({
+    defaultOptions: {},
+  });
+
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="formone" element={<FormOne />} />
-        <Route path="formtwo" element={<FormTwo />} />
-        <Route path="formthree" element={<FormThree />} />
-        <Route path="/success" element={<SuccessPage/>} />
+        <Route path="/multistep" element={<MultiStepForm />} />
       </Route>
     )
   );
 
   return (
     <div className="font-body">
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </div>
   );
 }
 
 export default App;
-
