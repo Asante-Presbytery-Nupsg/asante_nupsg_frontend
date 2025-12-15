@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import InputField from "./partials/InputField";
 import PageIndicator from "./partials/PageIndicator";
 import {
   MultiStepUserSchema,
@@ -38,7 +37,7 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
 ];
 
 const MultiStepForm: React.FC = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [programmeSearch, setProgrammeSearch] = useState("");
   const [institutionSearch, setInstitutionSearch] = useState("");
@@ -140,7 +139,7 @@ const MultiStepForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<MultiStepUserFormInput> = async (data) => {
     data.email = data.email?.trim();
-
+    if (data.dob === undefined) data.dob = "";
     try {
       const response = await registerUser(data);
       if (response) {
@@ -301,10 +300,12 @@ const MultiStepForm: React.FC = () => {
 
           {step === 2 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
+              <Input
                 label="Local Congregation"
                 name="congregation"
-                register={register}
+                register={register("congregation", {
+                  required: "Congregation is required",
+                })}
                 error={errors.congregation}
                 placeholder="Enter congregation"
               />
@@ -322,31 +323,39 @@ const MultiStepForm: React.FC = () => {
                 onSearch={setRegionSearch}
                 isLoading={isLoadingRegions}
               />
-              <InputField
+              <Input
                 label="Church District"
                 name="district_church"
-                register={register}
+                register={register("district_church", {
+                  required: "District is required",
+                })}
                 error={errors.district_church}
                 placeholder="Enter district"
               />
-              <InputField
+              <Input
                 label="Presbytery Name"
                 name="presbytery"
-                register={register}
+                register={register("presbytery", {
+                  required: "Presbytery is required",
+                })}
                 error={errors.presbytery}
                 placeholder="Enter presbytery"
               />
-              <InputField
+              <Input
                 label="Guardian/Parent Name"
                 name="guardian_name"
-                register={register}
+                register={register("guardian_name", {
+                  required: "Guardian name is required",
+                })}
                 error={errors.guardian_name}
                 placeholder="Enter guardian name"
               />
-              <InputField
+              <Input
                 label="Guardian/Parent Contact"
                 name="guardian_contact"
-                register={register}
+                register={register("guardian_contact", {
+                  required: "Guardian contact is required",
+                })}
                 error={errors.guardian_contact}
                 placeholder="Enter contact"
               />
