@@ -15,7 +15,6 @@ const DashHome = () => {
   });
 
   if (isLoading) return <div>Loading...</div>;
-  console.log(data.users);
   return (
     <div className="m-4 bg-white/35">
       <div className="border p-5 rounded-md">
@@ -23,7 +22,7 @@ const DashHome = () => {
           Welcome to the Admin Panel
         </h2>
         <p className="text-sm text-gray-500">
-          This is where you can manage your NUPS-G website.
+          This is where you can manage your data.
         </p>
       </div>
 

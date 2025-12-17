@@ -9,7 +9,6 @@ import {
   ChevronRightIcon,
   Search,
 } from "lucide-react";
-
 // Extend the user type with an ID and relation names
 type User = MultiStepUserInput & {
   id: string;
@@ -26,16 +25,21 @@ type UserTableProps = {
 
 export function UserTable({ users, isLoading = false }: UserTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedInstitution, setSelectedInstitution] = useState<
+    string | undefined
+  >();
+  const [selectedPresbytery, setSelectedPresbytery] = useState<
+    string | undefined
+  >();
 
   /* ========================
      Filtered Data
   ======================== */
   const filteredUsers = useMemo(() => {
-    if (!searchQuery.trim()) return users;
-
-    const query = searchQuery.toLowerCase();
     return users.filter((user) => {
-      return (
+      const query = searchQuery.toLowerCase();
+      const matchesSearch =
+        !query ||
         user.first_name?.toLowerCase().includes(query) ||
         user.last_name?.toLowerCase().includes(query) ||
         user.other_name?.toLowerCase().includes(query) ||
@@ -44,15 +48,19 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
         user.whatsapp?.toLowerCase().includes(query) ||
         user.programme_name?.toLowerCase().includes(query) ||
         user.institution_name?.toLowerCase().includes(query) ||
-        user.high_school?.toLowerCase().includes(query) ||
-        user.congregation?.toLowerCase().includes(query) ||
         user.region_name?.toLowerCase().includes(query) ||
-        user.presbytery_name?.toLowerCase().includes(query) ||
-        user.guardian_name?.toLowerCase().includes(query) ||
-        user.guardian_contact?.toLowerCase().includes(query)
-      );
+        user.presbytery_name?.toLowerCase().includes(query);
+
+      const matchesInstitution = selectedInstitution
+        ? user.institution_name === selectedInstitution
+        : true;
+      const matchesPresbytery = selectedPresbytery
+        ? user.presbytery_name === selectedPresbytery
+        : true;
+
+      return matchesSearch && matchesInstitution && matchesPresbytery;
     });
-  }, [users, searchQuery]);
+  }, [users, searchQuery, selectedInstitution, selectedPresbytery]);
 
   /* ========================
      Column Definitions
@@ -287,18 +295,56 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row">
         {/* Search Bar */}
-        <div className="flex items-center gap-2 w-88">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex items-start gap-2 w-full sm:w-96 flex-col">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search users..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full sm:w-88 pl-9 pr-4 py-1.5 border border-gray-300 rounded-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+
+          <div className="flex gap-2 flex-col min-[500px]:flex-row items-center w-full">
+            {/* Add filter dropdown for presbytery etc
+             */}
+            <select
+              value={selectedInstitution || ""}
+              onChange={(e) =>
+                setSelectedInstitution(e.target.value || undefined)
+              }
+              className="px-2 py-1.5 border border-gray-300 rounded bg-white text-sm w-full min-[500px]:w-fit"
+            >
+              <option value="">All Institutions</option>
+              {Array.from(
+                new Set(users.map((u) => u.institution_name).filter(Boolean))
+              ).map((i) => (
+                <option key={i} value={i}>
+                  {i && i?.length > 16 ? `${i?.slice(0, 20)}...` : i}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedPresbytery || ""}
+              onChange={(e) =>
+                setSelectedPresbytery(e.target.value || undefined)
+              }
+              className="px-2 py-1.5 border border-gray-300 rounded bg-white text-sm w-full min-[500px]:w-fit"
+            >
+              <option value="">All Presbyteries</option>
+              {Array.from(
+                new Set(users.map((u) => u.presbytery_name).filter(Boolean))
+              ).map((p) => (
+                <option key={p} value={p}>
+                  {p && p?.length > 16 ? `${p?.slice(0, 20)}...` : p}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -370,7 +416,7 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border border-gray-200 rounded-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b">
@@ -414,7 +460,7 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="px-4 py-5 text-sm text-gray-900"
+                        className="px-4 py-5 text-sm text-gray-700"
                       >
                         {typeof cell.column.columnDef.cell === "function"
                           ? cell.column.columnDef.cell(cell.getContext())
@@ -430,7 +476,8 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        {/* Left side: page size selector */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Show rows per page</span>
           <select
@@ -438,7 +485,7 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
             onChange={(e) => table.setPageSize(Number(e.target.value))}
             className="px-2 py-1 text-sm border border-gray-300 rounded bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {[8, 10, 20, 30, 50, 100].map((size) => (
+            {[5, 10, 20, 30, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
@@ -446,16 +493,17 @@ export function UserTable({ users, isLoading = false }: UserTableProps) {
           </select>
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
-            {pageIndex * table.getState().pagination.pageSize + 1}-
+        {/* Right side: page info + buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <span className="text-sm text-gray-600 hidden sm:block">
+            {pageIndex * table.getState().pagination.pageSize + 1} -{" "}
             {Math.min(
               (pageIndex + 1) * table.getState().pagination.pageSize,
               filteredUsers.length
             )}{" "}
             of {filteredUsers.length}
           </span>
-          <div className="flex gap-3">
+          <div className="flex gap-3 justify-between">
             <button
               onClick={previousPage}
               disabled={!canPreviousPage}
