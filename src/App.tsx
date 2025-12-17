@@ -10,6 +10,8 @@ import Home from "./pages/Home/Home";
 import MultiStepForm from "./pages/Forms/MultiStepForm";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import DashLayout from "./dashboard/layouts";
+import DashHome from "./dashboard/main/Home";
 function App() {
   const queryClient = new QueryClient({
     defaultOptions: {},
@@ -17,10 +19,18 @@ function App() {
 
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route path="/register" element={<MultiStepForm />} />
-      </Route>
+      <>
+        {/* Public routes */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="register" element={<MultiStepForm />} />
+        </Route>
+
+        {/* Dashboard routes */}
+        <Route path="/dashboard" element={<DashLayout />}>
+          <Route index element={<DashHome />} />
+        </Route>
+      </>
     )
   );
 
