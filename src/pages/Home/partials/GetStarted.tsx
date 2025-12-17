@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const GetStarted = () => {
   return (
     <div className="bg-slate-300 w-full py-20 md:py-28">
@@ -20,9 +22,12 @@ const GetStarted = () => {
 
           {/* button */}
           <div>
-            <button className="bg-[#C71B00] py-3 sm:py-4 md:py-5 px-6 sm:px-8 md:px-10 text-lg sm:text-xl md:text-2xl text-white rounded-xl transition-all duration-300 hover:bg-red-700">
+            <Link
+              to="/register"
+              className="bg-[#C71B00] py-2 sm:py-3 px-6 sm:px-8 text-lg sm:text-xl text-white rounded-xl transition-all duration-300 hover:bg-red-600"
+            >
               Register Now
-            </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -9,7 +9,12 @@ import {
 } from "@/schema/userSchema";
 import SuccessPage from "./SuccessModal";
 import { registerUser } from "@/api/auth.api";
-import { getInstitutions, getProgrammes, getRegions } from "@/api/misc.api";
+import {
+  getInstitutions,
+  getPresbyteries,
+  getProgrammes,
+  getRegions,
+} from "@/api/misc.api";
 import { Combobox } from "@/components/shared/combobox";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/shared/date_of_birth";
@@ -30,7 +35,7 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
     "congregation",
     "region_id",
     "district_church",
-    "presbytery",
+    "presbytery_id",
     "guardian_name",
     "guardian_contact",
   ],
@@ -42,6 +47,7 @@ const MultiStepForm: React.FC = () => {
   const [programmeSearch, setProgrammeSearch] = useState("");
   const [institutionSearch, setInstitutionSearch] = useState("");
   const [regionSearch, setRegionSearch] = useState("");
+  const [presbyterySearch, setPresbyterySearch] = useState("");
 
   const {
     register,
@@ -59,12 +65,14 @@ const MultiStepForm: React.FC = () => {
       programme_id: "",
       institution_id: "",
       region_id: "",
+      presbytery_id: "",
     },
   });
 
   const programmeValue = watch("programme_id");
   const institutionValue = watch("institution_id");
   const regionValue = watch("region_id");
+  const presbyteryValue = watch("presbytery_id");
 
   // Fetch initial programmes (loads 30 upfront)
   const { data: programmesData, isLoading: isLoadingProgrammes } = useQuery({
@@ -102,6 +110,18 @@ const MultiStepForm: React.FC = () => {
     placeholderData: (previousData) => previousData,
   });
 
+  const { data: presbyteryData, isLoading: isLoadingPresbyteries } = useQuery({
+    queryKey: ["presbyteries"],
+    queryFn: () =>
+      getPresbyteries({
+        pageIndex: 0,
+        pageSize: 30,
+        globalFilter: presbyterySearch,
+      }),
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+  });
+
   // Transform API data to combobox format
   const programmeOptions = React.useMemo(() => {
     if (!programmesData?.programmes) return [];
@@ -126,6 +146,14 @@ const MultiStepForm: React.FC = () => {
       label: region.name,
     }));
   }, [regionsData]);
+
+  const presbyteryOptions = React.useMemo(() => {
+    if (!presbyteryData?.presbyteries) return [];
+    return presbyteryData.presbyteries.map((presbytery) => ({
+      value: presbytery.id?.toString() || presbytery.name,
+      label: presbytery.name,
+    }));
+  }, [presbyteryData]);
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +194,7 @@ const MultiStepForm: React.FC = () => {
             : "Church & Family Details"}
         </p>
 
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-9 mt-4">
           <PageIndicator currentStep={step} totalSteps={3} />
         </div>
 
@@ -301,6 +329,7 @@ const MultiStepForm: React.FC = () => {
           {step === 2 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
+                className="h-10"
                 label="Local Congregation"
                 name="congregation"
                 register={register("congregation", {
@@ -317,8 +346,8 @@ const MultiStepForm: React.FC = () => {
                   setValue("region_id", val, { shouldValidate: true })
                 }
                 options={regionOptions}
-                placeholder="Select tertiary school"
-                searchPlaceholder="Search schools..."
+                placeholder="Select church region"
+                searchPlaceholder="Search regions..."
                 error={errors.region_id}
                 onSearch={setRegionSearch}
                 isLoading={isLoadingRegions}
@@ -332,14 +361,18 @@ const MultiStepForm: React.FC = () => {
                 error={errors.district_church}
                 placeholder="Enter district"
               />
-              <Input
-                label="Presbytery Name"
-                name="presbytery"
-                register={register("presbytery", {
-                  required: "Presbytery is required",
-                })}
-                error={errors.presbytery}
-                placeholder="Enter presbytery"
+              <Combobox
+                label="Presbytery"
+                value={presbyteryValue}
+                onChange={(val) =>
+                  setValue("presbytery_id", val, { shouldValidate: true })
+                }
+                options={presbyteryOptions}
+                placeholder="Select presbtery"
+                searchPlaceholder="Search presbtery..."
+                error={errors.presbytery_id}
+                onSearch={setPresbyterySearch}
+                isLoading={isLoadingPresbyteries}
               />
               <Input
                 label="Guardian/Parent Name"
@@ -377,14 +410,14 @@ const MultiStepForm: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="ml-auto inline-flex items-center px-8 py-2 tracking-wide bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
+                className="ml-auto inline-flex items-center px-8 py-2 cursor-pointer tracking-wide bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
               >
                 Next
               </button>
             ) : (
               <button
                 type="submit"
-                className="ml-auto inline-flex items-center px-8 py-2 tracking-wide bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
+                className="ml-auto inline-flex items-center cursor-pointer px-8 py-2 tracking-wide bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition"
               >
                 Finish
               </button>

@@ -37,7 +37,7 @@ export const ChurchSchema = z.object({
   congregation: z.string().min(1, "Congregation is required"),
   region_id: z.string().min(1, "Region is required"),
   district_church: z.string().min(1, "Church district is required"),
-  presbytery: z.string().min(1, "Presbytery is required"),
+  presbytery_id: z.string().min(1, "Presbytery is required"),
   guardian_name: z.string().min(1, "Guardian name is required"),
   guardian_contact: z.string().min(1, "Guardian contact is required"),
 });

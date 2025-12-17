@@ -85,7 +85,7 @@ const HeroSection: React.FC = () => {
             variants={buttonVariant}
             className="pt-4"
           >
-            <Link to="/multistep">
+            <Link to="/register">
               <button className="bg-blue-700 py-3 sm:py-4 px-8 sm:px-10 md:px-14 text-lg sm:text-xl text-white rounded-2xl transition-all duration-300 hover:bg-blue-800 cursor-pointer">
                 Register Now
               </button>

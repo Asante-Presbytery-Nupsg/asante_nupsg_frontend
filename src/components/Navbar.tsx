@@ -50,10 +50,10 @@ const Navbar: React.FC = () => {
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center gap-4">
-            <button className="px-6 py-2.5 border border-blue-900 text-blue-900 rounded-2xl">
+            <button className="px-6 py-2.5 border border-blue-900 text-blue-900 rounded-2xl cursor-pointer hover:bg-blue-100 transition-all duration-200 ">
               About Us
             </button>
-            <button className="px-6 py-2.5 bg-blue-900 text-white rounded-2xl">
+            <button className="px-6 py-2.5 bg-blue-900 text-white rounded-2xl cursor-pointer hover:bg-blue-800 transition-all duration-200">
               Our socials
             </button>
           </div>

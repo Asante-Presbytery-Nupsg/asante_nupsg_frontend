@@ -19,7 +19,7 @@ function App() {
     createRoutesFromElements(
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="/multistep" element={<MultiStepForm />} />
+        <Route path="/register" element={<MultiStepForm />} />
       </Route>
     )
   );
