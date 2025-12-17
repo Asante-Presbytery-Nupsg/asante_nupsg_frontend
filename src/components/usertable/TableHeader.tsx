@@ -73,7 +73,7 @@ export function TableHeader<T>({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-center justify-between flex-wrap gap-4 mt-3 md:mt-0">
         <SelectionInfo
           selectedCount={selectedCount}
           onClear={onClearSelection}

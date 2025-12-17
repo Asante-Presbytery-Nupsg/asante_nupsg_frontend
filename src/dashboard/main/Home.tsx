@@ -2,7 +2,7 @@ import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { UserTable } from "./UserTable";
 import { BASE_API } from "@/api/base";
-import { User } from "lucide-react";
+import { Book, Building, Diamond, User } from "lucide-react";
 import StatCard from "@/components/shared/StatCard";
 import * as XLSX from "xlsx";
 import type { UserType } from "@/schema/userSchema";
@@ -166,13 +166,13 @@ const DashHome = () => {
         <StatCard
           title="Institutions"
           value={stats?.institutions}
-          icon={User}
+          icon={Building}
         />
-        <StatCard title="Programmes" value={stats?.programmes} icon={User} />
+        <StatCard title="Programmes" value={stats?.programmes} icon={Book} />
         <StatCard
           title="Presbyteries"
           value={stats?.presbyteries}
-          icon={User}
+          icon={Diamond}
         />
       </div>
 
