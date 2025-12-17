@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export interface ComboboxOption {
   value: string;
@@ -30,6 +31,7 @@ export interface ComboboxProps {
   searchPlaceholder?: string;
   onSearch?: (search: string) => void;
   isLoading?: boolean;
+  className?: string;
 }
 
 export function Combobox({
@@ -39,6 +41,7 @@ export function Combobox({
   placeholder = "Select option...",
   label,
   error,
+  className,
   searchPlaceholder,
   onSearch,
   isLoading = false,
@@ -66,9 +69,11 @@ export function Combobox({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={`w-full h-10 justify-between ${
-              error ? "border-red-500" : ""
-            }`}
+            className={cn(
+              className,
+              "w-full h-10 justify-between",
+              error && "border-red-500"
+            )}
           >
             <span className="truncate">
               {value
