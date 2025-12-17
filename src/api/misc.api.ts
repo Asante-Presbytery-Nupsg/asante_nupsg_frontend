@@ -1,7 +1,9 @@
 import type {
   GetInstitutionsParams,
+  GetPresbyteriesParams,
   GetProgrammesParams,
   PaginatedInstitutionsResponse,
+  PaginatedPresbyteriesResponse,
   PaginatedProgrammesResponse,
   PaginatedRegionsResponse,
   Programme,
@@ -130,6 +132,45 @@ export const getInstitutions = async ({
 
     return {
       institutions: data.institutions ?? [],
+      totalItems: data.totalItems ?? 0,
+      totalPages: data.totalPages ?? 0,
+      currentPage: data.currentPage ?? page,
+      pageSize: data.pageSize ?? pageSize,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Failed to fetch regions:", error.message);
+    } else {
+      console.error("Unexpected error while fetching regions:", error);
+    }
+    throw error;
+  }
+};
+
+export const getPresbyteries = async ({
+  pageIndex,
+  pageSize,
+  globalFilter = "",
+}: GetPresbyteriesParams): Promise<PaginatedPresbyteriesResponse> => {
+  try {
+    const page = pageIndex + 1;
+
+    const response = await BASE_API.get<PaginatedPresbyteriesResponse>(
+      "/presbyteries",
+      {
+        params: {
+          search: globalFilter || undefined,
+          page,
+          limit: pageSize,
+        },
+      }
+    );
+
+    // Safety: ensure we always return expected shape
+    const data = response.data;
+
+    return {
+      presbyteries: data.presbyteries ?? [],
       totalItems: data.totalItems ?? 0,
       totalPages: data.totalPages ?? 0,
       currentPage: data.currentPage ?? page,

@@ -18,7 +18,7 @@ function Input({
   ...props
 }: InputProps) {
   return (
-    <div className="w-full space-y-1.5">
+    <div className="w-full space-y-2">
       {label && (
         <label className="block text-sm font-medium text-slate-700">
           {label}
