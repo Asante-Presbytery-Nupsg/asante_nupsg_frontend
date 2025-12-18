@@ -37,6 +37,7 @@ export function FilterDropdowns({
         onSearch={onInstitutionSearch}
         isLoading={isLoadingInstitutions}
         className="rounded-xs w-full! md:w-64!"
+        clearable
       />
 
       <Combobox
@@ -49,6 +50,7 @@ export function FilterDropdowns({
         onSearch={onPresbyterySearch}
         isLoading={isLoadingPresbyteries}
         className="rounded-xs w-full! md:w-64!"
+        clearable
       />
     </div>
   );

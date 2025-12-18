@@ -4,7 +4,7 @@ const BASE_URL = "https://asante-nupsg-backend.onrender.com/api/v1";
 
 export const BASE_API = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // needed for refresh token cookie
+  withCredentials: true,
 });
 
 // ----------------------
@@ -32,13 +32,12 @@ BASE_API.interceptors.response.use(
     const message = error.response?.data?.message?.toLowerCase() || "";
     const isTokenExpired =
       (error.response?.status === 401 || error.response?.status === 403) &&
-      message.includes("expired");
+      (message.includes("expired") || message.includes("invalid"));
 
     if (isTokenExpired && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        // Use a separate client to avoid infinite loop
         const refreshClient = axios.create({
           baseURL: BASE_URL,
           withCredentials: true,
@@ -46,14 +45,24 @@ BASE_API.interceptors.response.use(
 
         const { data } = await refreshClient.post("/auth/refresh");
 
-        const newAccessToken = data.accessToken;
+        const newAccessToken =
+          data?.data?.accessToken || data?.accessToken || data;
+
+        if (!newAccessToken) {
+          throw new Error("No new access token received");
+        }
+
         localStorage.setItem("accessToken", newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
+        // Retry the original request with new token
         return BASE_API(originalRequest);
-      } catch {
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("accessToken");
-        return Promise.reject(error);
+        // Optional: force logout / redirect
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
       }
     }
 

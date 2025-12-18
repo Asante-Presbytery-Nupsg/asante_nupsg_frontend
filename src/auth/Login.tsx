@@ -2,7 +2,7 @@ import useAuth from "@/hooks/useAuth";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { AxiosError } from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
 
 interface LoginFormInputs {
   email: string;
@@ -12,6 +12,7 @@ interface LoginFormInputs {
 
 const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate(); // Hook for navigation
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const {
@@ -26,6 +27,8 @@ const Login = () => {
     setErrorMessage("");
     try {
       await login(data.email, data.password, data.rememberMe);
+      // Redirect only on success — this runs in a mounted component, so it works reliably
+      navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
       if (err instanceof AxiosError) {
         setErrorMessage(err.response?.data?.message || "Invalid credentials.");

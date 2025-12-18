@@ -1,78 +1,125 @@
-import { useCallback, useState, useEffect, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { BASE_API } from "../api/base";
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import { AuthContext, type LoginType } from "./AuthContext";
+import { BASE_API } from "../api/base";
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<LoginType | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const hasInitialized = useRef(false);
+
+  const isAuthenticated = Boolean(user);
 
   const clearSession = useCallback(() => {
     localStorage.removeItem("accessToken");
     setUser(null);
-    setIsAuthenticated(false);
   }, []);
 
-  const restoreSession = useCallback(async () => {
-    try {
-      const res = await BASE_API.get("/auth/admin/me");
-      const admin = res.data.user || res.data.data?.admin;
-
-      if (admin?.role === "Admin") {
-        setUser(admin);
-        setIsAuthenticated(true);
-      } else {
-        clearSession();
-      }
-    } catch (err) {
-      console.error("Session restoration failed", err);
-      clearSession();
-    } finally {
-      setLoading(false);
-    }
-  }, [clearSession]);
-
+  // Restore session on app load / page refresh
   useEffect(() => {
-    restoreSession();
-  }, [restoreSession]);
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const loadUser = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await BASE_API.get("/auth/admin/me");
+
+        // Your API returns: { success: true, data: { id, name, email, role, ... } }
+        const userData = res.data?.data;
+
+        if (userData && userData.role) {
+          setUser(userData);
+        } else {
+          console.warn("Invalid user data structure from /me", res.data);
+          clearSession();
+        }
+      } catch (error) {
+        console.error("Failed to load user on refresh:", error);
+        clearSession();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUser();
+  }, [clearSession]);
 
   const login = useCallback(
     async (email: string, password: string, rememberMe = false) => {
-      const res = await BASE_API.post("/auth/admin/login", {
-        email,
-        password,
-        rememberMe,
-      });
+      try {
+        const response = await BASE_API.post("/auth/admin/login", {
+          email,
+          password,
+          rememberMe,
+        });
 
-      const token = res.data.accessToken || res.data.data?.accessToken;
-      const admin = res.data.user || res.data.data?.admin;
+        // Login response: response.data.data.accessToken
+        const accessToken = response.data?.data?.accessToken;
+        if (!accessToken) {
+          throw new Error("No access token received from login");
+        }
 
-      if (token) {
-        localStorage.setItem("accessToken", token);
-        setUser(admin);
-        setIsAuthenticated(true);
-        navigate("/dashboard", { replace: true });
+        localStorage.setItem("accessToken", accessToken);
+
+        // Fetch current admin profile
+        const res = await BASE_API.get("/auth/admin/me");
+
+        // Critical fix: extract the actual user from res.data.data
+        const userData = res.data?.data;
+
+        if (!userData || !userData.role) {
+          throw new Error("Invalid user profile data received");
+        }
+
+        setUser(userData);
+
+        return { success: true, user: userData };
+      } catch (error) {
+        clearSession();
+        throw error;
       }
     },
-    [navigate]
+    [clearSession]
   );
 
   const logout = useCallback(async () => {
     try {
       await BASE_API.post("/auth/admin/logout");
+    } catch (error) {
+      console.warn("Logout endpoint failed (non-critical):", error);
     } finally {
       clearSession();
-      navigate("/login", { replace: true });
     }
-  }, [navigate, clearSession]);
+  }, [clearSession]);
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, loading, login, logout }}
+      value={{
+        user,
+        login,
+        logout,
+        isAuthenticated,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

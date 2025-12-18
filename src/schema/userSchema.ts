@@ -28,23 +28,37 @@ export const EducationSchema = z
   .object({
     programme_id: z.string().optional().nullable(),
     programme_name: z.string().optional().nullable(),
-    institution_id: z.string().min(1, "Institution is required"),
+    institution_id: z.string().optional().nullable(), // Made optional to allow manual entry
+    institution_name: z.string().optional().nullable(),
     residence: z.string().optional(),
     high_school: z.string().min(1, "High school is required"),
   })
   .superRefine((data, ctx) => {
+    // Programme validation: if no programme_id, programme_name is required
     if (
       !data.programme_id &&
       (!data.programme_name || data.programme_name.trim() === "")
     ) {
       ctx.addIssue({
         path: ["programme_name"],
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Please enter a programme name if no programme is selected",
       });
     }
-  });
 
+    // Institution validation: if no institution_id, institution_name is required
+    if (
+      !data.institution_id &&
+      (!data.institution_name || data.institution_name.trim() === "")
+    ) {
+      ctx.addIssue({
+        path: ["institution_name"],
+        code: "custom",
+        message:
+          "Please enter an institution name if no institution is selected",
+      });
+    }
+  });
 /**
  * STEP 3 — Church & Family Details
  */

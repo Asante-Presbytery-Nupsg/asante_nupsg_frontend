@@ -30,7 +30,14 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
     "whatsapp",
     "dob",
   ],
-  ["programme_id", "institution_id", "residence", "high_school"],
+  [
+    "programme_id",
+    "institution_id",
+    "programme_name",
+    "institution_name",
+    "residence",
+    "high_school",
+  ],
   [
     "congregation",
     "region_id",
@@ -49,6 +56,9 @@ const MultiStepForm: React.FC = () => {
   const [regionSearch, setRegionSearch] = useState("");
   const [presbyterySearch, setPresbyterySearch] = useState("");
   const [showCustomProgrammeInput, setShowCustomProgrammeInput] =
+    useState(false);
+
+  const [showCustomInstitutionInput, setShowCustomInstitutionInput] =
     useState(false);
 
   const {
@@ -278,22 +288,6 @@ const MultiStepForm: React.FC = () => {
 
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Institution Combobox */}
-              <Combobox
-                label="Tertiary School Attended"
-                value={institutionValue}
-                onChange={(val) =>
-                  setValue("institution_id", val, { shouldValidate: true })
-                }
-                options={institutionOptions}
-                placeholder="Select tertiary school"
-                searchPlaceholder="Search schools..."
-                error={errors.institution_id}
-                onSearch={setInstitutionSearch}
-                isLoading={isLoadingInstitutions}
-                clearable
-              />
-
               <Input
                 label="Hall/Hostel(if any)"
                 register={register("residence")}
@@ -335,10 +329,25 @@ const MultiStepForm: React.FC = () => {
                 isLoading={isLoadingProgrammes}
                 clearable={true}
               />
+              {/* Institution Combobox */}
+              <Combobox
+                label="Tertiary School Attended"
+                value={institutionValue || ""}
+                onChange={(val) =>
+                  setValue("institution_id", val, { shouldValidate: true })
+                }
+                options={institutionOptions}
+                placeholder="Select tertiary school"
+                searchPlaceholder="Search schools..."
+                error={errors.institution_id}
+                onSearch={setInstitutionSearch}
+                isLoading={isLoadingInstitutions}
+                clearable
+              />
 
               {/* Link to enter custom programme if none selected */}
               {!watch("programme_id") && !showCustomProgrammeInput && (
-                <div className="flex items-center mt-1 col-span-full">
+                <div className="flex items-center mt-1 col-span-1">
                   <button
                     type="button"
                     className="text-blue-700 text-sm hover:underline"
@@ -349,11 +358,39 @@ const MultiStepForm: React.FC = () => {
                 </div>
               )}
 
+              {!watch("institution_id") && !showCustomInstitutionInput && (
+                <div className="flex items-center mt-1">
+                  <button
+                    type="button"
+                    className="text-blue-700 text-sm hover:underline"
+                    onClick={() => setShowCustomInstitutionInput(true)}
+                  >
+                    Can't find institution? Click here
+                  </button>
+                </div>
+              )}
+
+              {/* Custom institution input */}
+              {showCustomInstitutionInput && !watch("institution_id") && (
+                <div className="col-span-full">
+                  <Input
+                    label="Enter Institution Name(if not selecting from list)"
+                    register={register("institution_name", {
+                      required:
+                        "Please enter institution name if not selecting from list",
+                    })}
+                    error={errors.institution_name}
+                    placeholder="Enter your institution name"
+                    className="h-10"
+                  />
+                </div>
+              )}
+
               {/* Custom programme input */}
               {showCustomProgrammeInput && !watch("programme_id") && (
                 <div className="col-span-full">
                   <Input
-                    label="Enter Programme Name"
+                    label="Enter Programme Name (if not selecting from list)"
                     register={register("programme_name", {
                       required:
                         "Please enter programme name if not selecting from list",
