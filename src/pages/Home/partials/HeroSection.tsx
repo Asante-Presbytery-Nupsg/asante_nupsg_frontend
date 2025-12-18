@@ -59,7 +59,7 @@ const HeroSection: React.FC = () => {
           animate="visible"
           variants={textVariant}
         >
-          Welcome to the Presbyterians Registration Portal
+          Welcome to the Presbyterian Freshers Registration Portal
         </motion.div>
 
         <motion.div
