@@ -37,6 +37,23 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "/unauthorized",
+        element: (
+          <div className="h-screen flex items-center justify-center px-5 flex-col gap-2">
+            <h1 className="text-7xl font-black uppercase">403</h1>
+            <p className="text-gray-600 text-center">
+              You are not authorized to access this page.
+            </p>
+            <button
+              onClick={() => window.location.replace("/")}
+              className="bg-[#C71B00] py-2 px-7 text-white rounded-xs cursor-pointer transition-all duration-300 hover:bg-red-600"
+            >
+              Go Home
+            </button>
+          </div>
+        ),
+      },
+      {
         path: "/dashboard",
         element: (
           <RequireAdmin>
