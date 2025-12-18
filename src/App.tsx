@@ -1,9 +1,4 @@
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 
 import Layout from "./pages/layout/Layout";
 import Home from "./pages/Home/Home";
@@ -14,40 +9,50 @@ import DashLayout from "./dashboard/layouts";
 import DashHome from "./dashboard/main/Home";
 import Login from "./auth/Login";
 import RequireAdmin from "./auth/RequireAuth";
-import AuthProvider from "./contexts/AuthProvider";
+import { AuthProvider } from "./contexts/AuthProvider";
+
+// Root component that provides AuthProvider for all routes
+function RootLayout() {
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
+}
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Layout />,
+        children: [
+          { index: true, element: <Home /> },
+          { path: "register", element: <MultiStepForm /> },
+        ],
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <RequireAdmin>
+            <DashLayout />
+          </RequireAdmin>
+        ),
+        children: [{ index: true, element: <DashHome /> }],
+      },
+    ],
+  },
+]);
 
 function App() {
   const queryClient = new QueryClient({
     defaultOptions: {},
   });
-
-  const router = createBrowserRouter(
-    createRoutesFromElements(
-      <>
-        {/* Public routes */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="register" element={<MultiStepForm />} />
-        </Route>
-
-        <Route path="login" element={<Login />} />
-
-        {/* Dashboard routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <AuthProvider>
-              <RequireAdmin>
-                <DashLayout />
-              </RequireAdmin>
-            </AuthProvider>
-          }
-        >
-          <Route index element={<DashHome />} />
-        </Route>
-      </>
-    )
-  );
 
   return (
     <QueryClientProvider client={queryClient}>
