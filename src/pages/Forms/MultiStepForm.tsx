@@ -433,7 +433,7 @@ const MultiStepForm: React.FC = () => {
               <button
                 type="button"
                 onClick={handleBack}
-                className="inline-flex items-center px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition"
+                className="inline-flex items-center px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition cursor-pointer"
               >
                 Back
               </button>
