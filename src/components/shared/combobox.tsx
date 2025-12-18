@@ -104,13 +104,13 @@ export function Combobox({
 
             <div className="flex items-center space-x-1">
               {clearable && value && (
-                <button
-                  type="button"
+                <div
+                  role="button"
                   onClick={handleClear}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
-                </button>
+                </div>
               )}
               <ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
             </div>
