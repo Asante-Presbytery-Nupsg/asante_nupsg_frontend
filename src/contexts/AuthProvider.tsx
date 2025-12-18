@@ -15,47 +15,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
   }, []);
 
-  useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem("accessToken");
+  const restoreSession = useCallback(async () => {
+    try {
+      const res = await BASE_API.get("/auth/admin/me");
+      const admin = res.data.user || res.data.data?.admin;
 
-      if (!token) {
-        setLoading(false);
-        return;
+      if (admin?.role === "Admin") {
+        setUser(admin);
+        setIsAuthenticated(true);
+      } else {
+        clearSession();
       }
-
-      try {
-        // This call will use the interceptor in base.ts if the token is expired
-        const res = await BASE_API.get("/auth/admin/me");
-        const admin = res.data.user || res.data.data?.admin;
-
-        if (admin?.role === "Admin") {
-          setUser(admin);
-          setIsAuthenticated(true);
-        } else {
-          clearSession();
-        }
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error(err.message);
-          console.error("Session restoration failed");
-          clearSession();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
+    } catch (err) {
+      console.error("Session restoration failed", err);
+      clearSession();
+    } finally {
+      setLoading(false);
+    }
   }, [clearSession]);
 
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
+
   const login = useCallback(
-    async (email: string, password: string, rememberMe: boolean = false) => {
+    async (email: string, password: string, rememberMe = false) => {
       const res = await BASE_API.post("/auth/admin/login", {
         email,
         password,
         rememberMe,
       });
+
       const token = res.data.accessToken || res.data.data?.accessToken;
       const admin = res.data.user || res.data.data?.admin;
 
