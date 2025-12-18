@@ -289,7 +289,7 @@ const MultiStepForm: React.FC = () => {
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Hall/Hostel(if any)"
+                label="Hall/Hostel(Or Place of residence on campus)"
                 register={register("residence")}
                 error={errors.residence}
                 placeholder="Enter hall/hostel name"
@@ -430,15 +430,7 @@ const MultiStepForm: React.FC = () => {
                 onSearch={setRegionSearch}
                 isLoading={isLoadingRegions}
               />
-              <Input
-                label="Church District"
-                name="district_church"
-                register={register("district_church", {
-                  required: "District is required",
-                })}
-                error={errors.district_church}
-                placeholder="Enter district"
-              />
+           
               <Combobox
                 label="Presbytery"
                 value={presbyteryValue}
@@ -478,7 +470,7 @@ const MultiStepForm: React.FC = () => {
               <button
                 type="button"
                 onClick={handleBack}
-                className="inline-flex items-center px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition"
+                className="inline-flex items-center px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-md hover:bg-blue-50 transition cursor-pointer"
               >
                 Back
               </button>
