@@ -17,11 +17,11 @@ const RequireAdmin = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return user?.role === "Admin" ? (
-    <>{children}</>
-  ) : (
-    <Navigate to="/unauthorized" replace />
-  );
+  if (user?.role !== "Admin") {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default RequireAdmin;
