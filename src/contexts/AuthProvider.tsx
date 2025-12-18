@@ -1,108 +1,82 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useCallback, useState, useEffect, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { BASE_API } from "../api/base";
 import { AuthContext, type LoginType } from "./AuthContext";
-import { AxiosError } from "axios";
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<LoginType | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const clearSession = useCallback(() => {
+    localStorage.removeItem("accessToken");
+    setUser(null);
+    setIsAuthenticated(false);
+  }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await BASE_API.get("/auth/me", { withCredentials: true });
-        const loggedInUser: LoginType = res.data.user;
+    const initAuth = async () => {
+      const token = localStorage.getItem("accessToken");
 
-        if (loggedInUser.role === "Admin") {
-          setUser(loggedInUser);
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // This call will use the interceptor in base.ts if the token is expired
+        const res = await BASE_API.get("/auth/admin/me");
+        const admin = res.data.user || res.data.data?.admin;
+
+        if (admin?.role === "Admin") {
+          setUser(admin);
           setIsAuthenticated(true);
         } else {
-          setUser(null);
-          setIsAuthenticated(false);
-          navigate("/login", { replace: true });
+          clearSession();
         }
       } catch (err: unknown) {
-        setUser(null);
-        setIsAuthenticated(false);
-        if (err instanceof AxiosError) {
-          if (err.response?.status === 401) {
-            navigate("/login", { replace: true });
-          }
+        if (err instanceof Error) {
+          console.error(err.message);
+          console.error("Session restoration failed");
+          clearSession();
         }
       } finally {
         setLoading(false);
       }
     };
 
-    const publicRoutes = [
-      "/login",
-      "/forgot-password",
-      "/reset-password",
-      "/verify-email",
-      "/",
-    ];
-    if (!publicRoutes.includes(location.pathname)) {
-      checkAuth();
-    } else {
-      setLoading(false);
-    }
-  }, [location.pathname, navigate]);
+    initAuth();
+  }, [clearSession]);
 
-  const login = async (
-    email: string,
-    password: string,
-    rememberMe: boolean = false
-  ) => {
-    try {
-      const res = await BASE_API.post(
-        "/auth/admin/login",
-        { email, password, rememberMe },
-        { withCredentials: true }
-      );
-
-      localStorage.setItem("accessToken", res.data.accessToken);
-
-      const { data } = await BASE_API.get("/auth/admin/me", {
-        withCredentials: true,
+  const login = useCallback(
+    async (email: string, password: string, rememberMe: boolean = false) => {
+      const res = await BASE_API.post("/auth/admin/login", {
+        email,
+        password,
+        rememberMe,
       });
-      const loggedInUser: LoginType = data.user;
+      const token = res.data.accessToken || res.data.data?.accessToken;
+      const admin = res.data.user || res.data.data?.admin;
 
-      if (loggedInUser.role === "Admin") {
-        setUser(loggedInUser);
+      if (token) {
+        localStorage.setItem("accessToken", token);
+        setUser(admin);
         setIsAuthenticated(true);
         navigate("/dashboard", { replace: true });
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        navigate("/login", { replace: true });
       }
-    } catch (err: unknown) {
-      console.error("Login failed:", err);
-      setUser(null);
-      setIsAuthenticated(false);
-      throw err;
-    }
-  };
+    },
+    [navigate]
+  );
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
-      await BASE_API.post("/auth/admin/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error("Logout failed", err);
+      await BASE_API.post("/auth/admin/logout");
     } finally {
-      setUser(null);
-      setIsAuthenticated(false);
+      clearSession();
       navigate("/login", { replace: true });
     }
-  };
+  }, [navigate, clearSession]);
 
   return (
     <AuthContext.Provider
@@ -112,5 +86,3 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
-
-export default AuthProvider;
