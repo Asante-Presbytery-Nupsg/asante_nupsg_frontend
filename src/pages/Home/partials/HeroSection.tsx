@@ -59,7 +59,7 @@ const HeroSection: React.FC = () => {
           animate="visible"
           variants={textVariant}
         >
-          Welcome to the NUPS-G Freshers' Registration Portal
+          Welcome to the Presbyterians Registration Portal
         </motion.div>
 
         <motion.div
