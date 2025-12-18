@@ -30,7 +30,7 @@ const stepFields: Array<Array<keyof MultiStepUserFormInput>> = [
     "whatsapp",
     "dob",
   ],
-  ["programme_id", "institution_id", "district_institution", "high_school"],
+  ["programme_id", "institution_id", "residence", "high_school"],
   [
     "congregation",
     "region_id",
@@ -48,6 +48,8 @@ const MultiStepForm: React.FC = () => {
   const [institutionSearch, setInstitutionSearch] = useState("");
   const [regionSearch, setRegionSearch] = useState("");
   const [presbyterySearch, setPresbyterySearch] = useState("");
+  const [showCustomProgrammeInput, setShowCustomProgrammeInput] =
+    useState(false);
 
   const {
     register,
@@ -276,20 +278,7 @@ const MultiStepForm: React.FC = () => {
 
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Combobox
-                label="Programme"
-                value={programmeValue}
-                onChange={(val) =>
-                  setValue("programme_id", val, { shouldValidate: true })
-                }
-                options={programmeOptions}
-                placeholder="Select programme"
-                searchPlaceholder="Search programmes..."
-                error={errors.programme_id}
-                onSearch={setProgrammeSearch}
-                isLoading={isLoadingProgrammes}
-              />
-
+              {/* Institution Combobox */}
               <Combobox
                 label="Tertiary School Attended"
                 value={institutionValue}
@@ -302,15 +291,14 @@ const MultiStepForm: React.FC = () => {
                 error={errors.institution_id}
                 onSearch={setInstitutionSearch}
                 isLoading={isLoadingInstitutions}
+                clearable
               />
 
               <Input
-                label="District"
-                register={register("district_institution", {
-                  required: "District is required",
-                })}
-                error={errors.district_institution}
-                placeholder="Enter district"
+                label="Hall/Hostel(if any)"
+                register={register("residence")}
+                error={errors.residence}
+                placeholder="Enter hall/hostel name"
                 className="h-10"
               />
 
@@ -320,9 +308,62 @@ const MultiStepForm: React.FC = () => {
                   required: "High school is required",
                 })}
                 error={errors.high_school}
-                placeholder="Enter high school attended"
+                placeholder="eg. St Pauls Senior High School"
                 className="h-10"
               />
+
+              {/* Programme Combobox */}
+              <Combobox
+                label="Programme"
+                value={programmeValue || ""}
+                onChange={(val) => {
+                  // Set the form value
+                  setValue("programme_id", val || "", { shouldValidate: true });
+
+                  if (val) {
+                    setShowCustomProgrammeInput(false);
+                    setValue("programme_name", "");
+                  } else {
+                    setShowCustomProgrammeInput(true);
+                  }
+                }}
+                options={programmeOptions}
+                placeholder="Select programme"
+                searchPlaceholder="Search programmes..."
+                error={errors.programme_id}
+                onSearch={setProgrammeSearch}
+                isLoading={isLoadingProgrammes}
+                clearable={true}
+              />
+
+              {/* Link to enter custom programme if none selected */}
+              {!watch("programme_id") && !showCustomProgrammeInput && (
+                <div className="flex items-center mt-1 col-span-full">
+                  <button
+                    type="button"
+                    className="text-blue-700 text-sm hover:underline"
+                    onClick={() => setShowCustomProgrammeInput(true)}
+                  >
+                    Can't find programme? Click here
+                  </button>
+                </div>
+              )}
+
+              {/* Custom programme input */}
+              {showCustomProgrammeInput && !watch("programme_id") && (
+                <div className="col-span-full">
+                  <Input
+                    label="Enter Programme Name"
+                    register={register("programme_name", {
+                      required:
+                        "Please enter programme name if not selecting from list",
+                    })}
+                    error={errors.programme_name}
+                    placeholder="Enter your programme name"
+                    className="h-10"
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -336,7 +377,7 @@ const MultiStepForm: React.FC = () => {
                   required: "Congregation is required",
                 })}
                 error={errors.congregation}
-                placeholder="Enter congregation"
+                placeholder="eg. Christ Congregation"
               />
 
               <Combobox
@@ -390,7 +431,7 @@ const MultiStepForm: React.FC = () => {
                   required: "Guardian contact is required",
                 })}
                 error={errors.guardian_contact}
-                placeholder="Enter contact"
+                placeholder="eg. +233123456789"
               />
             </div>
           )}

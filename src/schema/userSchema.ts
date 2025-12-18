@@ -22,13 +22,28 @@ export const PersonalInfoSchema = z.object({
 
 /**
  * STEP 2 — Educational Background
+ * - Require programme_name if programme_id is empty
  */
-export const EducationSchema = z.object({
-  programme_id: z.string().min(1, "Program is required"),
-  institution_id: z.string().min(1, "Institution is required"),
-  district_institution: z.string().min(1, "District is required"),
-  high_school: z.string().min(1, "High school is required"),
-});
+export const EducationSchema = z
+  .object({
+    programme_id: z.string().optional().nullable(),
+    programme_name: z.string().optional().nullable(),
+    institution_id: z.string().min(1, "Institution is required"),
+    residence: z.string().optional(),
+    high_school: z.string().min(1, "High school is required"),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      !data.programme_id &&
+      (!data.programme_name || data.programme_name.trim() === "")
+    ) {
+      ctx.addIssue({
+        path: ["programme_name"],
+        code: z.ZodIssueCode.custom,
+        message: "Please enter a programme name if no programme is selected",
+      });
+    }
+  });
 
 /**
  * STEP 3 — Church & Family Details
@@ -54,15 +69,12 @@ export const MultiStepUserSchema = PersonalInfoSchema.extend(
  * - MultiStepUserFormInput → what React Hook Form receives (strings)
  * - MultiStepUserInput → what your backend receives (Date objects)
  */
-
-// This is what RHF receives (before coercion)
 export type MultiStepUserFormInput = {
   [K in keyof z.input<typeof MultiStepUserSchema>]: z.input<
     typeof MultiStepUserSchema
   >[K];
 };
 
-// This is after Zod validation (converted types, Date for dob)
 export type MultiStepUserInput = z.infer<typeof MultiStepUserSchema>;
 export type UserType = z.infer<typeof MultiStepUserSchema> & {
   id: number;
@@ -82,8 +94,8 @@ export type UserTableProps = {
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
   onSearchChange?: (search: string) => void;
-  onInstitutionChange?: (institutionId: string | undefined) => void;
-  onPresbyteryChange?: (presbyteryId: string | undefined) => void;
+  onInstitutionChange?: (institutionId?: string) => void;
+  onPresbyteryChange?: (presbyteryId?: string) => void;
   allInstitutions?: Array<{ id: string; name: string }>;
   allPresbyteries?: Array<{ id: string; name: string }>;
   onExport?: (format: "csv" | "xlsx") => Promise<void>;

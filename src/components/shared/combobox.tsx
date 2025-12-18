@@ -34,6 +34,20 @@ export interface ComboboxProps {
   className?: string;
 }
 
+export interface ComboboxProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: ComboboxOption[];
+  placeholder?: string;
+  label?: string;
+  error?: { message?: string };
+  searchPlaceholder?: string;
+  onSearch?: (search: string) => void;
+  isLoading?: boolean;
+  className?: string;
+  clearable?: boolean; // new prop
+}
+
 export function Combobox({
   value,
   onChange,
@@ -45,6 +59,7 @@ export function Combobox({
   searchPlaceholder,
   onSearch,
   isLoading = false,
+  clearable = false, // default false
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
@@ -56,8 +71,14 @@ export function Combobox({
     }
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent opening popover
+    onChange("");
+    setSearchValue("");
+  };
+
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2 relative">
       {label && (
         <label className="block text-sm font-medium text-slate-700">
           {label}
@@ -80,7 +101,19 @@ export function Combobox({
                 ? options.find((option) => option.value === value)?.label
                 : placeholder}
             </span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+
+            <div className="flex items-center space-x-1">
+              {clearable && value && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              )}
+              <ChevronsUpDown className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+            </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent

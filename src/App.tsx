@@ -12,6 +12,10 @@ import MultiStepForm from "./pages/Forms/MultiStepForm";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DashLayout from "./dashboard/layouts";
 import DashHome from "./dashboard/main/Home";
+import Login from "./auth/Login";
+import RequireAdmin from "./auth/RequireAuth";
+import AuthProvider from "./contexts/AuthProvider";
+
 function App() {
   const queryClient = new QueryClient({
     defaultOptions: {},
@@ -26,8 +30,19 @@ function App() {
           <Route path="register" element={<MultiStepForm />} />
         </Route>
 
+        <Route path="login" element={<Login />} />
+
         {/* Dashboard routes */}
-        <Route path="/dashboard" element={<DashLayout />}>
+        <Route
+          path="/dashboard"
+          element={
+            <AuthProvider>
+              <RequireAdmin>
+                <DashLayout />
+              </RequireAdmin>
+            </AuthProvider>
+          }
+        >
           <Route index element={<DashHome />} />
         </Route>
       </>
@@ -35,11 +50,9 @@ function App() {
   );
 
   return (
-    <div className="font-body">
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   );
 }
 
