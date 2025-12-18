@@ -49,7 +49,7 @@ export function TableHeader<T>({
   isLoadingPresbyteries,
 }: TableHeaderProps<T>) {
   return (
-    <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row">
+    <div className="flex items-start justify-between flex-col md:flex-row">
       {/* Search and Filters */}
       <div className="flex items-start gap-2 w-full sm:w-96 flex-col">
         <SearchInput

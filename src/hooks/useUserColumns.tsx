@@ -40,7 +40,11 @@ export const useUserColumns = () => {
       {
         accessorKey: "other_name",
         header: "Other Name",
-        cell: ({ getValue }) => getValue<string>() || "—",
+        cell: ({ cell }) => (
+          <div className="flex items-center gap-2">
+            <span className="text-nowrap">{cell.getValue<string>()}</span>
+          </div>
+        ),
       },
       {
         accessorKey: "email",
@@ -72,7 +76,7 @@ export const useUserColumns = () => {
         header: "WhatsApp",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="truncate max-w-[20ch]">
+            <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("whatsapp")}
             </span>
           </div>
@@ -91,7 +95,7 @@ export const useUserColumns = () => {
         header: "Programme",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="truncate max-w-[20ch]">
+            <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("programme_name")}
             </span>
           </div>
@@ -102,7 +106,7 @@ export const useUserColumns = () => {
         header: "Institution",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="truncate max-w-[18ch]">
+            <span className="truncate max-w-[18ch] text-nowrap">
               {row.getValue("institution_name")}
             </span>
           </div>
@@ -113,7 +117,7 @@ export const useUserColumns = () => {
         header: "High School",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="truncate max-w-[20ch]">
+            <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("high_school")}
             </span>
           </div>

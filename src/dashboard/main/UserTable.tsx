@@ -108,6 +108,27 @@ export function UserTable({
 
   const columns = useUserColumns();
 
+  const initialColumnVisibility = useMemo(
+    () => ({
+      email: true,
+      phone: true,
+      institution_name: true,
+      presbytery_name: true,
+
+      // hidden by default
+      whatsapp: false,
+      dob: false,
+      guardian_name: false,
+      guardian_contact: false,
+      other_name: false,
+      region_name: false,
+      district_church: false,
+      created_at: false,
+      updated_at: false,
+    }),
+    []
+  );
+
   const {
     table,
     pageIndex,
@@ -129,6 +150,7 @@ export function UserTable({
       serverSide && totalCount
         ? Math.ceil(totalCount / serverPageSize)
         : undefined,
+    initialColumnVisibility,
   });
 
   // Pagination handlers
