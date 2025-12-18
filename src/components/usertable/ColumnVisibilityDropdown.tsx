@@ -12,7 +12,7 @@ export function ColumnVisibilityDropdown<T>({
 }: ColumnVisibilityDropdownProps<T>) {
   return (
     <div className="relative group">
-      <button className="px-3 py-2 cursor-pointer text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1">
+      <button className="px-2 min-[390px]:px-3 py-2 cursor-pointer text-xs min-[390px]:text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-1">
         Columns <ChevronDown size={16} />
       </button>
       <div className="absolute right-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
