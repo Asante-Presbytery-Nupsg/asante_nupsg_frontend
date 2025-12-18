@@ -280,7 +280,7 @@ const MultiStepForm: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Institution Combobox */}
               <Combobox
-                label="Tertiary School Attended"
+                label="Tertiary School Admitted Into"
                 value={institutionValue}
                 onChange={(val) =>
                   setValue("institution_id", val, { shouldValidate: true })
