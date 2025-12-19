@@ -101,7 +101,9 @@ export const useUserColumns = () => {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="truncate max-w-[20ch] text-nowrap">
-              {row.getValue("programme_name")}
+              {row.getValue("programme_name")
+                ? row.getValue("programme_name")
+                : "NULL"}
             </span>
           </div>
         ),
