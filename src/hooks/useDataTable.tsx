@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   type ColumnDef,
   type RowSelectionState,
   type VisibilityState,
+  type PaginationState,
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
@@ -14,6 +15,7 @@ type UseDataTableProps<T> = {
   data: T[];
   columns: ColumnDef<T, unknown>[];
   pageSize?: number;
+  pageIndex?: number; // Added to support controlled server-side pagination
   manualPagination?: boolean;
   pageCount?: number;
   initialColumnVisibility?: VisibilityState;
@@ -25,23 +27,19 @@ export function useDataTable<T>({
   data,
   columns,
   pageSize = 10,
+  pageIndex = 0,
   manualPagination = false,
   pageCount,
   initialColumnVisibility,
 }: UseDataTableProps<T>) {
-  const getInitialColumnVisibility = (): VisibilityState => {
-    if (typeof window === "undefined") {
-      return initialColumnVisibility ?? {};
-    }
+  // 1. Column Visibility Persistence Logic
+  const getInitialColumnVisibility = useCallback((): VisibilityState => {
+    if (typeof window === "undefined") return initialColumnVisibility ?? {};
 
     const saved = localStorage.getItem(COLUMN_VISIBILITY_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
+    if (saved) return JSON.parse(saved);
 
-    const visibility: VisibilityState = {
-      ...initialColumnVisibility,
-    };
+    const visibility: VisibilityState = { ...initialColumnVisibility };
 
     columns.forEach((col) => {
       const columnId =
@@ -58,13 +56,31 @@ export function useDataTable<T>({
     });
 
     return visibility;
-  };
+  }, [columns, initialColumnVisibility]);
 
+  // 2. States
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    getInitialColumnVisibility
+    getInitialColumnVisibility()
   );
 
+  // Pagination state: Controlled by props when manualPagination is true
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: pageIndex,
+    pageSize: pageSize,
+  });
+
+  // 3. Sync internal state with props (CRITICAL for Server-Side)
+  // This prevents the "flash" by forcing the table state to match your API state
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+    }));
+  }, [pageIndex, pageSize]);
+
+  // Persist column visibility
   useEffect(() => {
     localStorage.setItem(
       COLUMN_VISIBILITY_KEY,
@@ -72,46 +88,46 @@ export function useDataTable<T>({
     );
   }, [columnVisibility]);
 
+  // 4. Table Instance
   const table = useReactTable({
     data,
     columns,
     state: {
       rowSelection,
       columnVisibility,
+      pagination,
     },
+    // CRITICAL: Prevents reset to page 0 when 'data' updates from server
+    autoResetPageIndex: false,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     manualPagination,
     pageCount,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: manualPagination
       ? undefined
       : getPaginationRowModel(),
-    initialState: {
-      pagination: { pageSize },
-    },
     enableRowSelection: true,
   });
 
+  // 5. Helper Methods
   const selectedRows = table.getSelectedRowModel().rows;
 
   const exportToCSV = () => {
     const visibleColumns = table
       .getAllLeafColumns()
       .filter((col) => col.getIsVisible());
-
     const headers = visibleColumns.map((col) => col.id);
-
     const rows = table
       .getFilteredRowModel()
       .rows.map((row) => headers.map((header) => row.getValue(header)));
 
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "table-export.csv";
+    link.download = `export-${new Date().toISOString()}.csv`;
     link.click();
   };
 
@@ -119,7 +135,6 @@ export function useDataTable<T>({
     const visibleColumns = table
       .getAllLeafColumns()
       .filter((col) => col.getIsVisible());
-
     const rows = table.getFilteredRowModel().rows.map((row) => {
       const obj: Record<string, unknown> = {};
       visibleColumns.forEach((col) => {
@@ -131,21 +146,17 @@ export function useDataTable<T>({
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-    const buffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+    const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 
     saveAs(
       new Blob([buffer], { type: "application/octet-stream" }),
-      "table-export.xlsx"
+      `export-${new Date().toISOString()}.xlsx`
     );
   };
 
   return {
     table,
-    pageIndex: table.getState().pagination.pageIndex,
+    pageIndex: pagination.pageIndex,
     pageCount: table.getPageCount(),
     nextPage: table.nextPage,
     previousPage: table.previousPage,

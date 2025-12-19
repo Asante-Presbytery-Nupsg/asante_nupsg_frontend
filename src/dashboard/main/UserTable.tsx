@@ -1,46 +1,56 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { type UserType } from "@/schema/userSchema";
-import { useDataTable } from "@/hooks/useDataTable";
 import { useUserColumns } from "../../hooks/useUserColumns";
 import TablePagination from "@/components/shared/TablePagination";
 import { TableHeader } from "@/components/usertable/TableHeader";
 import { DataTable } from "@/components/usertable/DataTable";
+import {
+  type RowSelectionState,
+  type VisibilityState,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 type UserTableProps = {
   users: UserType[];
   isLoading?: boolean;
-  serverSide?: boolean;
-  totalCount?: number;
-  currentPage?: number;
-  pageSize?: number;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (size: number) => void;
-  onSearchChange?: (search: string) => void;
-  onInstitutionChange?: (institutionId: string | undefined) => void;
-  onPresbyteryChange?: (presbyteryId: string | undefined) => void;
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  onSearchChange: (search: string) => void;
+  onInstitutionChange: (institutionId: string | undefined) => void;
+  onPresbyteryChange: (presbyteryId: string | undefined) => void;
+
+  /** ✅ async-safe */
   allInstitutions?: Array<{ id: string; name: string }>;
   allPresbyteries?: Array<{ id: string; name: string }>;
-  onExport?: (format: "csv" | "xlsx") => Promise<void>;
-  onInstitutionSearch?: (search: string) => void;
-  onPresbyterySearch?: (search: string) => void;
+
+  onExport: (format: "csv" | "xlsx") => Promise<void>;
+  onInstitutionSearch: (search: string) => void;
+  onPresbyterySearch: (search: string) => void;
   isLoadingInstitutions?: boolean;
   isLoadingPresbyteries?: boolean;
 };
 
+const COLUMN_VISIBILITY_KEY = "datatable-column-visibility";
+
 export function UserTable({
   users,
   isLoading = false,
-  serverSide = false,
   totalCount,
-  currentPage = 1,
-  pageSize: serverPageSize = 10,
+  currentPage,
+  pageSize,
   onPageChange,
   onPageSizeChange,
   onSearchChange,
   onInstitutionChange,
   onPresbyteryChange,
-  allInstitutions,
-  allPresbyteries,
+
+  allInstitutions = [], // ✅ default
+  allPresbyteries = [], // ✅ default
+
   onExport,
   onInstitutionSearch,
   onPresbyterySearch,
@@ -55,209 +65,117 @@ export function UserTable({
     string | undefined
   >();
   const [isExporting, setIsExporting] = useState(false);
-
-  // Debounce search for server-side
-  useEffect(() => {
-    if (!serverSide) return;
-    const timer = setTimeout(() => {
-      onSearchChange?.(searchQuery);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery, serverSide, onSearchChange]);
-
-  // Handle filter changes
-  useEffect(() => {
-    if (!serverSide) return;
-    onInstitutionChange?.(selectedInstitution);
-  }, [selectedInstitution, serverSide, onInstitutionChange]);
-
-  useEffect(() => {
-    if (!serverSide) return;
-    onPresbyteryChange?.(selectedPresbytery);
-  }, [selectedPresbytery, serverSide, onPresbyteryChange]);
-
-  // Client-side filtering
-  const filteredUsers = useMemo(() => {
-    if (serverSide) return users;
-
-    return users.filter((user) => {
-      const query = searchQuery.toLowerCase();
-      const matchesSearch =
-        !query ||
-        user.first_name?.toLowerCase().includes(query) ||
-        user.last_name?.toLowerCase().includes(query) ||
-        user.other_name?.toLowerCase().includes(query) ||
-        user.email?.toLowerCase().includes(query) ||
-        user.phone?.toLowerCase().includes(query) ||
-        user.whatsapp?.toLowerCase().includes(query) ||
-        user.programme_name?.toLowerCase().includes(query) ||
-        user.institution_name?.toLowerCase().includes(query) ||
-        user.region_name?.toLowerCase().includes(query) ||
-        user.presbytery_name?.toLowerCase().includes(query);
-
-      const matchesInstitution = selectedInstitution
-        ? user.institution_name === selectedInstitution
-        : true;
-      const matchesPresbytery = selectedPresbytery
-        ? user.presbytery_name === selectedPresbytery
-        : true;
-
-      return matchesSearch && matchesInstitution && matchesPresbytery;
-    });
-  }, [users, searchQuery, selectedInstitution, selectedPresbytery, serverSide]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => {
+      if (typeof window === "undefined") return {};
+      const saved = localStorage.getItem(COLUMN_VISIBILITY_KEY);
+      return saved
+        ? JSON.parse(saved)
+        : {
+            email: true,
+            phone: true,
+            institution_name: true,
+            presbytery_name: true,
+            whatsapp: false,
+            dob: false,
+            guardian_name: false,
+            guardian_contact: false,
+            other_name: false,
+            region_name: false,
+            district_church: false,
+          };
+    }
+  );
 
   const columns = useUserColumns();
 
-  const initialColumnVisibility = useMemo(
-    () => ({
-      email: true,
-      phone: true,
-      institution_name: true,
-      presbytery_name: true,
-
-      // hidden by default
-      whatsapp: false,
-      dob: false,
-      guardian_name: false,
-      guardian_contact: false,
-      other_name: false,
-      region_name: false,
-      district_church: false,
-      created_at: false,
-      updated_at: false,
-    }),
-    []
-  );
-
-  const {
-    table,
-    pageIndex,
-    nextPage,
-    previousPage,
-    canNextPage,
-    canPreviousPage,
-    selectedRows,
-    resetSelection,
-    setColumnVisibility,
-    exportToCSV,
-    exportToXLSX,
-  } = useDataTable({
-    data: filteredUsers as UserType[],
+  const table = useReactTable({
+    data: users,
     columns,
-    pageSize: serverSide ? serverPageSize : 10,
-    manualPagination: serverSide,
-    pageCount:
-      serverSide && totalCount
-        ? Math.ceil(totalCount / serverPageSize)
-        : undefined,
-    initialColumnVisibility,
+    state: { rowSelection, columnVisibility },
+    onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: (updater) => {
+      setColumnVisibility((old) => {
+        const newState = typeof updater === "function" ? updater(old) : updater;
+        localStorage.setItem(COLUMN_VISIBILITY_KEY, JSON.stringify(newState));
+        return newState;
+      });
+    },
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    enableRowSelection: true,
   });
 
-  // Pagination handlers
-  const handleNextPage = () => {
-    if (serverSide) {
-      onPageChange?.(currentPage + 1);
-    } else {
-      nextPage();
-    }
-  };
+  /* -------------------------- SAFE OPTION MAPPING -------------------------- */
 
-  const handlePreviousPage = () => {
-    if (serverSide) {
-      onPageChange?.(currentPage - 1);
-    } else {
-      previousPage();
-    }
-  };
-
-  const handlePageSizeChange = (size: number) => {
-    if (serverSide) {
-      onPageSizeChange?.(size);
-    } else {
-      table.setPageSize(size);
-    }
-  };
-
-  const toggleColumn = (columnId: string) => {
-    setColumnVisibility((prev) => ({
-      ...prev,
-      [columnId]: !prev[columnId],
-    }));
-  };
-
-  // Get filter options
-  const institutionOptions = serverSide
-    ? (allInstitutions || []).map((inst) => ({
+  const institutionOptions = useMemo(
+    () =>
+      allInstitutions.map((inst) => ({
         value: inst.id,
         label: inst.name,
-      }))
-    : Array.from(
-        new Set(users.map((u) => u.institution_name).filter(Boolean))
-      ).map((name) => ({ value: name!, label: name! }));
+      })),
+    [allInstitutions]
+  );
 
-  const presbyteryOptions = serverSide
-    ? (allPresbyteries || []).map((pres) => ({
+  const presbyteryOptions = useMemo(
+    () =>
+      allPresbyteries.map((pres) => ({
         value: pres.id,
         label: pres.name,
-      }))
-    : Array.from(
-        new Set(users.map((u) => u.presbytery_name).filter(Boolean))
-      ).map((name) => ({ value: name!, label: name! }));
+      })),
+    [allPresbyteries]
+  );
 
-  // Export handlers
+  /* ------------------------------- Handlers -------------------------------- */
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setTimeout(() => onSearchChange(value), 500);
+  };
+
+  const handleInstitutionChange = (value: string | undefined) => {
+    setSelectedInstitution(value);
+    onInstitutionChange(value);
+  };
+
+  const handlePresbyteryChange = (value: string | undefined) => {
+    setSelectedPresbytery(value);
+    onPresbyteryChange(value);
+  };
+
   const handleExport = async (format: "csv" | "xlsx") => {
-    if (serverSide && onExport) {
-      setIsExporting(true);
-      try {
-        await onExport(format);
-      } finally {
-        setIsExporting(false);
-      }
-    } else {
-      if (format === "csv") {
-        exportToCSV();
-      } else {
-        exportToXLSX();
-      }
+    setIsExporting(true);
+    try {
+      await onExport(format);
+    } finally {
+      setIsExporting(false);
     }
   };
 
-  // Pagination display values
-  const displayPageSize = serverSide
-    ? serverPageSize
-    : table.getState().pagination.pageSize;
-  const displayPageIndex = serverSide ? currentPage - 1 : pageIndex;
-  const displayTotalCount = serverSide ? totalCount || 0 : filteredUsers.length;
-  const isNextDisabled = serverSide
-    ? totalCount
-      ? currentPage >= Math.ceil(totalCount / serverPageSize)
-      : false
-    : !canNextPage;
-  const isPrevDisabled = serverSide ? currentPage <= 1 : !canPreviousPage;
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500">Loading users...</div>
-      </div>
-    );
-  }
+  const selectedRows = table.getSelectedRowModel().rows;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <div className="w-full space-y-4">
       <TableHeader
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         selectedInstitution={selectedInstitution}
         selectedPresbytery={selectedPresbytery}
-        onInstitutionChange={setSelectedInstitution}
-        onPresbyteryChange={setSelectedPresbytery}
+        onInstitutionChange={handleInstitutionChange}
+        onPresbyteryChange={handlePresbyteryChange}
         institutionOptions={institutionOptions}
         presbyteryOptions={presbyteryOptions}
         selectedCount={selectedRows.length}
-        onClearSelection={resetSelection}
+        onClearSelection={() => table.resetRowSelection()}
         table={table}
-        onToggleColumn={toggleColumn}
+        onToggleColumn={(id) =>
+          setColumnVisibility((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+          }))
+        }
         onExportCSV={() => handleExport("csv")}
         onExportExcel={() => handleExport("xlsx")}
         isExporting={isExporting}
@@ -267,22 +185,35 @@ export function UserTable({
         isLoadingPresbyteries={isLoadingPresbyteries}
       />
 
-      <DataTable
-        table={table}
-        columns={columns}
-        emptyMessage="No users found"
-        searchQuery={searchQuery}
-      />
+      <div className="relative min-h-[400px]">
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+            <p className="text-sm font-medium text-gray-600">
+              Loading users...
+            </p>
+          </div>
+        )}
+
+        <DataTable
+          table={table}
+          columns={columns}
+          emptyMessage="No users found"
+          searchQuery={searchQuery}
+        />
+      </div>
 
       <TablePagination
-        displayPageSize={displayPageSize}
-        displayPageIndex={displayPageIndex}
-        displayTotalCount={displayTotalCount}
-        handlePageSizeChange={handlePageSizeChange}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-        isPrevDisabled={isPrevDisabled}
-        isNextDisabled={isNextDisabled}
+        displayPageSize={pageSize}
+        displayPageIndex={currentPage - 1}
+        displayTotalCount={totalCount}
+        handlePageSizeChange={(size) => {
+          onPageSizeChange(size);
+          onPageChange(1);
+        }}
+        handlePreviousPage={() => onPageChange(currentPage - 1)}
+        handleNextPage={() => onPageChange(currentPage + 1)}
+        isPrevDisabled={currentPage <= 1}
+        isNextDisabled={currentPage >= totalPages}
       />
     </div>
   );

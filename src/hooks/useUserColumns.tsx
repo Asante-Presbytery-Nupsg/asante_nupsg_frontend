@@ -30,19 +30,37 @@ export const useUserColumns = () => {
       {
         accessorKey: "first_name",
         header: "First Name",
-        cell: ({ getValue }) => getValue<string>(),
+        cell: ({ getValue }) => {
+          return (
+            <div className="flex items-center gap-2 font-medium">
+              <span className="truncate max-w-[20ch]">
+                {getValue<string>() || "NULL"}
+              </span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: "last_name",
         header: "Last Name",
-        cell: ({ getValue }) => getValue<string>(),
+        cell: ({ getValue }) => {
+          return (
+            <div className="flex items-center gap-2 font-medium">
+              <span className="truncate max-w-[20ch]">
+                {getValue<string>() || "NULL"}
+              </span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: "other_name",
         header: "Other Name",
         cell: ({ cell }) => (
-          <div className="flex items-center gap-2">
-            <span className="text-nowrap">{cell.getValue<string>()}</span>
+          <div className="flex items-center gap-2 font-medium">
+            <span className="text-nowrap">
+              {cell.getValue<string>() || "NULL"}
+            </span>
           </div>
         ),
       },
@@ -50,12 +68,12 @@ export const useUserColumns = () => {
         accessorKey: "email",
         header: "Email",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span
               title={row.getValue("email")}
               className="truncate max-w-[20ch]"
             >
-              {row.getValue("email")}
+              {row.getValue("email") || "NULL"}
             </span>
           </div>
         ),
@@ -64,7 +82,7 @@ export const useUserColumns = () => {
         accessorKey: "phone",
         header: "Phone",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("phone")}
             </span>
@@ -75,7 +93,7 @@ export const useUserColumns = () => {
         accessorKey: "whatsapp",
         header: "WhatsApp",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("whatsapp") ? row.getValue("whatsapp") : "NULL"}
             </span>
@@ -86,7 +104,7 @@ export const useUserColumns = () => {
         accessorKey: "dob",
         header: "Date of Birth",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="text-nowrap">
               {row.getValue("dob")
                 ? format(row.getValue("dob"), "dd MMM, yyyy")
@@ -99,7 +117,7 @@ export const useUserColumns = () => {
         accessorKey: "programme_name",
         header: "Programme",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("programme_name")
                 ? row.getValue("programme_name")
@@ -112,7 +130,7 @@ export const useUserColumns = () => {
         accessorKey: "institution_name",
         header: "Institution",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[18ch] text-nowrap">
               {row.getValue("institution_name")}
             </span>
@@ -123,7 +141,7 @@ export const useUserColumns = () => {
         accessorKey: "high_school",
         header: "High School",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch] text-nowrap">
               {row.getValue("high_school")}
             </span>
@@ -134,7 +152,7 @@ export const useUserColumns = () => {
         accessorKey: "congregation",
         header: "Congregation",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("congregation")}
             </span>
@@ -145,7 +163,7 @@ export const useUserColumns = () => {
         accessorKey: "region_name",
         header: "Region",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("region_name")}
             </span>
@@ -156,7 +174,7 @@ export const useUserColumns = () => {
         accessorKey: "district_church",
         header: "Church District",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("district_church")}
             </span>
@@ -167,7 +185,7 @@ export const useUserColumns = () => {
         accessorKey: "presbytery_name",
         header: "Presbytery",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("presbytery_name")}
             </span>
@@ -178,7 +196,7 @@ export const useUserColumns = () => {
         accessorKey: "guardian_name",
         header: "Guardian Name",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("guardian_name")}
             </span>
@@ -189,7 +207,7 @@ export const useUserColumns = () => {
         accessorKey: "guardian_contact",
         header: "Guardian Contact",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 font-medium">
             <span className="truncate max-w-[20ch]">
               {row.getValue("guardian_contact")}
             </span>
