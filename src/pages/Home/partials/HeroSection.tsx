@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import img1 from "../../../assets/Rectangle 1.svg";
-import img2 from "../../../assets/Rectangle 2.svg";
-import img3 from "../../../assets/Rectangle 5.svg";
+import papa from "../../../assets/papa.webp";
+import guy from "../../../assets/guy1.webp";
+import lady from "../../../assets/lady.webp";
 
 const textVariant = {
   hidden: { opacity: 0, y: -40 },
@@ -52,9 +52,9 @@ const imageVariant = {
 const HeroSection: React.FC = () => {
   return (
     <div className="w-full bg-slate-50 min-h-screen overflow-hidden">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-5 md:px-0">
         <motion.div
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl tracking-wide lg:leading-16 xl:leading-20 text-blue-900 font-extrabold text-center pt-12 pb-6 capitalize"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-wide lg:leading-16 xl:leading-20 text-blue-900 font-extrabold text-center pt-12 pb-6 capitalize"
           initial="hidden"
           animate="visible"
           variants={textVariant}
@@ -93,19 +93,21 @@ const HeroSection: React.FC = () => {
           </motion.div>
 
           <div className="w-full flex flex-col sm:flex-row justify-center sm:justify-between items-center sm:items-end gap-4 mt-10">
-            {[img1, img2, img3].map((src, index) => (
+            {[guy, papa, lady].map((src, index) => (
               <motion.div
                 key={index}
                 custom={index}
                 initial="hidden"
                 animate="visible"
                 variants={imageVariant}
-                className="w-full sm:w-1/3"
+                className="h-80 sm:h-auto w-full sm:w-1/3 rounded-[3rem] border-4 border-white overflow-clip overlay-gradient"
               >
                 <img
                   src={src}
                   alt={`image-${index}`}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover object-top ${
+                    index === 1 ? "h-full md:h-[19rem]!" : ""
+                  }`}
                 />
               </motion.div>
             ))}

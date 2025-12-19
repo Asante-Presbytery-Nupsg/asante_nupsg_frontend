@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const GetStarted = () => {
   return (
-    <div className="bg-slate-300 w-full py-20 md:py-28">
+    <div className="executive-overlay w-full py-20 md:py-28 xl:py-36">
       {/* inner container */}
       <div className="w-[90%] md:w-[70%] lg:w-[60%] mx-auto flex items-center justify-center">
         {/* wrapper */}

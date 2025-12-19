@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
-
-
 
 @custom-variant dark (&:is(.dark *));
 
@@ -134,8 +132,44 @@
       rgba(236, 242, 252, 1) 100%
     );
   }
+
+  .executive-overlay {
+    background: linear-gradient(
+        to bottom,
+        rgba(242, 247, 255, 0.8) 0%,
+        rgba(236, 242, 252, 0.9) 100%
+      ),
+      url("../public/images/executives.webp");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .overlay-gradient {
+    position: relative;
+    overflow: hidden;
+  }
+  .overlay-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(236, 242, 252, 0.65) 80%,
+      rgba(236, 242, 252, 1) 100%
+    );
+    @media (max-width: 440px) {
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(236, 242, 252, 0.45) 80%,
+        rgba(236, 242, 252, 1) 100%
+      );
+    }
+  }
 }
 
-@theme{
+@theme {
   --font-body: "Outfit", sans-serif;
 }
