@@ -4,16 +4,16 @@ const HowItWorksSection = () => {
       {/* outer container */}
       <div className="w-full bg-slate-50 pb-12 flex items-center">
         {/* inner container */}
-        <div className="w-[90%] md:w-[70%] lg:w-[60%] mx-auto h-full flex flex-col md:flex-row items-start md:items-center gap-10 md:gap-0">
+        <div className="w-[90%] md:w-[70%] lg:w-[60%] mx-auto h-full flex flex-col lg:flex-row items-start md:items-center gap-10 lg:gap-0">
           {/* left side text */}
-          <div className="w-full md:w-[50%]">
+          <div className="w-full lg:w-[50%]">
             <h2 className="text-4xl md:text-5xl lg:text-6xl text-blue-900 font-semibold">
               How It Works
             </h2>
           </div>
 
           {/* right side steps */}
-          <div className="w-full md:w-[50%] flex flex-col gap-6">
+          <div className="w-full lg:w-[50%] flex flex-col gap-6">
             {/* step 1 */}
             <div>
               <p className="text-2xl md:text-3xl font-semibold text-[#52627D]">

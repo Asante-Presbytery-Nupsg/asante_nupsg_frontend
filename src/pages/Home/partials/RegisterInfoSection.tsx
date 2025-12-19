@@ -7,9 +7,9 @@ const RegisterInfoSection = () => {
       {/* outer container */}
       <div className="w-full bg-slate-50 py-20 md:py-32">
         {/* inner container */}
-        <div className="w-full md:w-[80%] lg:w-[70%] mx-auto flex flex-col md:flex-row items-center justify-between gap-10 px-4">
+        <div className="w-full md:w-[80%] lg:w-[70%] mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 px-4">
           {/* images container */}
-          <div className="flex items-center justify-center relative w-full md:w-[45%]">
+          <div className="flex items-center justify-center relative w-full lg:w-[45%]">
             {/* left image */}
             <div className="w-[60%] sm:w-[55%] md:w-[60%] overflow-hidden">
               <img
@@ -30,7 +30,7 @@ const RegisterInfoSection = () => {
           </div>
 
           {/* text content */}
-          <div className="w-full md:w-[50%]">
+          <div className="w-full lg:w-[50%]">
             <p className="text-slate-600 text-xl sm:text-2xl md:text-3xl leading-tight tracking-wide">
               This platform has been designed to help you connect with the union
               on your campus and become part of a growing family of believers

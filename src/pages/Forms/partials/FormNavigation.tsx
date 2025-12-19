@@ -29,7 +29,7 @@ const FormNavigation: React.FC<FormNavigationProps> = ({
         <button
           type="button"
           onClick={onNext}
-          className="ml-auto inline-flex items-center px-8 py-2 cursor-pointer tracking-wide bg-blue-600 text-white font-medium rounded-sm hover:bg-blue-700 transition"
+          className="ml-auto inline-flex items-center px-8 py-2 cursor-pointer tracking-wide bg-[#1354BE] text-white font-medium rounded-sm hover:bg-blue-700 transition"
         >
           Next
         </button>
@@ -37,7 +37,7 @@ const FormNavigation: React.FC<FormNavigationProps> = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="ml-auto inline-flex items-center justify-center gap-2 px-8 py-2 tracking-wide bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+          className="ml-auto inline-flex items-center justify-center gap-2 px-8 py-2 tracking-wide bg-[#1354BE] text-white font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
         >
           {isSubmitting && (
             <svg
