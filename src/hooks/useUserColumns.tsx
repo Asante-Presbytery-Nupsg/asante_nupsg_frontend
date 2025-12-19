@@ -77,7 +77,7 @@ export const useUserColumns = () => {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="truncate max-w-[20ch] text-nowrap">
-              {row.getValue("whatsapp")}
+              {row.getValue("whatsapp") ? row.getValue("whatsapp") : "NULL"}
             </span>
           </div>
         ),
@@ -85,10 +85,15 @@ export const useUserColumns = () => {
       {
         accessorKey: "dob",
         header: "Date of Birth",
-        cell: ({ getValue }) => {
-          const date = getValue<string | Date>();
-          return date ? format(new Date(date), "MMM dd, yyyy") : "—";
-        },
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <span className="truncate max-w-[20ch]">
+              {row.getValue("dob")
+                ? format(row.getValue("dob"), "dd/MM/yyyy")
+                : "NULL"}
+            </span>
+          </div>
+        ),
       },
       {
         accessorKey: "programme_name",
@@ -147,7 +152,7 @@ export const useUserColumns = () => {
       },
       {
         accessorKey: "district_church",
-        header: "District (Church)",
+        header: "Church District",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <span className="truncate max-w-[20ch]">
