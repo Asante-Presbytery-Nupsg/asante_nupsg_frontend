@@ -89,7 +89,7 @@ export const useUserColumns = () => {
           <div className="flex items-center gap-2">
             <span className="text-nowrap">
               {row.getValue("dob")
-                ? format(row.getValue("dob"), "dd/MM/yyyy")
+                ? format(row.getValue("dob"), "dd MMM, yyyy")
                 : "NULL"}
             </span>
           </div>
