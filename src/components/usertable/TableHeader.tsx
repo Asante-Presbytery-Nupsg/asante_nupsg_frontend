@@ -51,7 +51,7 @@ export function TableHeader<T>({
   return (
     <div className="flex items-start justify-between flex-col md:flex-row">
       {/* Search and Filters */}
-      <div className="flex items-start gap-2 w-full sm:w-96 flex-col">
+      <div className="flex items-start gap-2 w-full sm:w-96 lg:w-[488px] flex-col">
         <SearchInput
           value={searchQuery}
           onChange={onSearchChange}

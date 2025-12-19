@@ -23,7 +23,7 @@ export function DataTable<T>({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-4 text-left text-sm font-medium text-gray-700 text-nowrap"
+                    className="px-4 py-4 text-left text-xs font-bold tracking-wider uppercase text-gray-700 text-nowrap"
                   >
                     {header.isPlaceholder
                       ? null

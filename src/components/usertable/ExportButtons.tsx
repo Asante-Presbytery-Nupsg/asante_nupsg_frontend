@@ -21,7 +21,7 @@ export function ExportButtons({
       <button
         onClick={onExportExcel}
         disabled={isExporting}
-        className="px-2 min-[420px]:px-3 py-2 text-xs min-[420px]:text-sm cursor-pointer bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-2  min-[420px]:px-3 py-2 text-xs min-[420px]:text-sm cursor-pointer bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isExporting ? "Exporting..." : "Export Excel"}
       </button>

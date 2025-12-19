@@ -21,7 +21,7 @@ export function SearchInput({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full sm:w-88 pl-9 pr-4 py-1.5 border border-gray-300 rounded-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full sm:w-full pl-9 pr-4 py-1.5 border border-gray-300 rounded-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         autoComplete="off"
       />
     </div>
