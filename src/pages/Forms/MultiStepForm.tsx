@@ -497,15 +497,17 @@ const MultiStepForm: React.FC = () => {
                 onSearch={setRegionSearch}
                 isLoading={isLoadingRegions}
               />
+              
               <Input
                 label="Church District"
                 name="district_church"
                 register={register("district_church", {
-                  required: "Church district is required",
+                  required: "District is required",
                 })}
                 error={errors.district_church}
-                placeholder="eg. Adweso"
+                placeholder="Enter district"
               />
+              
               <Combobox
                 label="Presbytery"
                 value={presbyteryValue}
