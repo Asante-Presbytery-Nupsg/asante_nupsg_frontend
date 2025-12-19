@@ -87,7 +87,7 @@ export const useUserColumns = () => {
         header: "Date of Birth",
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="truncate max-w-[20ch]">
+            <span className="text-nowrap">
               {row.getValue("dob")
                 ? format(row.getValue("dob"), "dd/MM/yyyy")
                 : "NULL"}
