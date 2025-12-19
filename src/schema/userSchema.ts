@@ -28,37 +28,52 @@ export const EducationSchema = z
   .object({
     programme_id: z.string().optional().nullable(),
     programme_name: z.string().optional().nullable(),
-    institution_id: z.string().optional().nullable(), // Made optional to allow manual entry
+    institution_id: z.string().optional().nullable(),
     institution_name: z.string().optional().nullable(),
     residence: z.string().optional(),
     high_school: z.string().min(1, "High school is required"),
   })
   .superRefine((data, ctx) => {
-    // Programme validation: if no programme_id, programme_name is required
-    if (
-      !data.programme_id &&
-      (!data.programme_name || data.programme_name.trim() === "")
-    ) {
+    // Programme validation
+    const programmeId = (data.programme_id || "").trim();
+    const programmeName = (data.programme_name || "").trim();
+
+    const hasProgramme = programmeId.length > 0 || programmeName.length > 0;
+
+    if (!hasProgramme) {
+      ctx.addIssue({
+        path: ["programme_id"],
+        code: "custom",
+        message: "Please select a programme",
+      });
       ctx.addIssue({
         path: ["programme_name"],
         code: "custom",
-        message: "Please enter a programme name if no programme is selected",
+        message: "Please enter a programme name",
       });
     }
 
-    // Institution validation: if no institution_id, institution_name is required
-    if (
-      !data.institution_id &&
-      (!data.institution_name || data.institution_name.trim() === "")
-    ) {
+    // Institution validation
+    const institutionId = (data.institution_id || "").trim();
+    const institutionName = (data.institution_name || "").trim();
+
+    const hasInstitution =
+      institutionId.length > 0 || institutionName.length > 0;
+
+    if (!hasInstitution) {
+      ctx.addIssue({
+        path: ["institution_id"],
+        code: "custom",
+        message: "Please select an institution",
+      });
       ctx.addIssue({
         path: ["institution_name"],
         code: "custom",
-        message:
-          "Please enter an institution name if no institution is selected",
+        message: "Please enter an institution name",
       });
     }
   });
+
 /**
  * STEP 3 — Church & Family Details
  */
@@ -73,10 +88,10 @@ export const ChurchSchema = z.object({
 
 /**
  * Combined schema for the entire multi-step form
+ * IMPORTANT: Use merge() instead of extend() to preserve superRefine validation
  */
-export const MultiStepUserSchema = PersonalInfoSchema.extend(
-  EducationSchema.shape
-).extend(ChurchSchema.shape);
+export const MultiStepUserSchema =
+  PersonalInfoSchema.merge(EducationSchema).merge(ChurchSchema);
 
 /**
  * TYPES

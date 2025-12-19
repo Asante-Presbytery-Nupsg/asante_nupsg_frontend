@@ -68,16 +68,21 @@ const MultiStepForm: React.FC = () => {
     watch,
     control,
     setValue,
+    getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<MultiStepUserFormInput>({
     resolver: zodResolver(MultiStepUserSchema),
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: {
       dob: undefined,
       programme_id: "",
       institution_id: "",
       region_id: "",
       presbytery_id: "",
+      programme_name: "",
+      institution_name: "",
     },
   });
 
@@ -169,8 +174,58 @@ const MultiStepForm: React.FC = () => {
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const values = getValues();
+
+    // Special validation for step 1 (education)
+    if (step === 1) {
+      // Check what we have
+      const progId = (values.programme_id || "").trim();
+      const progName = (values.programme_name || "").trim();
+      const instId = (values.institution_id || "").trim();
+      const instName = (values.institution_name || "").trim();
+
+      const hasProgramme = progId.length > 0 || progName.length > 0;
+      const hasInstitution = instId.length > 0 || instName.length > 0;
+
+      // Clear previous errors
+      clearErrors([
+        "programme_id",
+        "programme_name",
+        "institution_id",
+        "institution_name",
+      ]);
+
+      let hasErrors = false;
+
+      if (!hasProgramme) {
+        setError("programme_name", {
+          type: "manual",
+          message: "Please select or enter a programme",
+        });
+        hasErrors = true;
+      }
+
+      if (!hasInstitution) {
+        setError("institution_name", {
+          type: "manual",
+          message: "Please select or enter an institution",
+        });
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        return;
+      }
+    }
+
     const valid = await trigger(stepFields[step]);
-    if (valid) setStep(step + 1);
+
+    if (!valid) {
+      return;
+    }
+
+    setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -288,64 +343,81 @@ const MultiStepForm: React.FC = () => {
 
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Residence */}
               <Input
-                label="Hall/Hostel(Or Place of residence on campus)"
+                label="Hall/Hostel (or Place of residence on campus)"
                 register={register("residence")}
                 error={errors.residence}
                 placeholder="Enter hall/hostel name"
                 className="h-10"
               />
 
+              {/* High School */}
               <Input
                 label="High School Attended"
-                register={register("high_school", {
-                  required: "High school is required",
-                })}
+                register={register("high_school")}
                 error={errors.high_school}
                 placeholder="eg. St Pauls Senior High School"
                 className="h-10"
               />
 
               {/* Programme Combobox */}
-              <Combobox
-                label="Programme"
-                value={programmeValue || ""}
-                onChange={(val) => {
-                  // Set the form value
-                  setValue("programme_id", val || "", { shouldValidate: true });
+              <div className="col-span-1">
+                <Combobox
+                  label="Programme"
+                  value={programmeValue || ""}
+                  onChange={(val) => {
+                    if (val) {
+                      setValue("programme_id", val, { shouldValidate: true });
+                      setValue("programme_name", "", { shouldValidate: true });
+                      setShowCustomProgrammeInput(false);
+                    } else {
+                      setValue("programme_id", "", { shouldValidate: true });
+                      setValue("programme_name", "", { shouldValidate: true });
+                      setShowCustomProgrammeInput(true);
+                    }
+                  }}
+                  options={programmeOptions}
+                  placeholder="Select programme"
+                  searchPlaceholder="Search programmes..."
+                  error={errors.programme_id || errors.programme_name}
+                  onSearch={setProgrammeSearch}
+                  isLoading={isLoadingProgrammes}
+                  clearable
+                />
+              </div>
 
-                  if (val) {
-                    setShowCustomProgrammeInput(false);
-                    setValue("programme_name", "");
-                  } else {
-                    setShowCustomProgrammeInput(true);
-                  }
-                }}
-                options={programmeOptions}
-                placeholder="Select programme"
-                searchPlaceholder="Search programmes..."
-                error={errors.programme_id}
-                onSearch={setProgrammeSearch}
-                isLoading={isLoadingProgrammes}
-                clearable={true}
-              />
               {/* Institution Combobox */}
-              <Combobox
-                label="Tertiary School Attended"
-                value={institutionValue || ""}
-                onChange={(val) =>
-                  setValue("institution_id", val, { shouldValidate: true })
-                }
-                options={institutionOptions}
-                placeholder="Select tertiary school"
-                searchPlaceholder="Search schools..."
-                error={errors.institution_id}
-                onSearch={setInstitutionSearch}
-                isLoading={isLoadingInstitutions}
-                clearable
-              />
+              <div className="col-span-1">
+                <Combobox
+                  label="Tertiary School Attended"
+                  value={institutionValue || ""}
+                  onChange={(val) => {
+                    if (val) {
+                      setValue("institution_id", val, { shouldValidate: true });
+                      setValue("institution_name", "", {
+                        shouldValidate: true,
+                      });
+                      setShowCustomInstitutionInput(false);
+                    } else {
+                      setValue("institution_id", "", { shouldValidate: true });
+                      setValue("institution_name", "", {
+                        shouldValidate: true,
+                      });
+                      setShowCustomInstitutionInput(true);
+                    }
+                  }}
+                  options={institutionOptions}
+                  placeholder="Select tertiary school"
+                  searchPlaceholder="Search schools..."
+                  error={errors.institution_id || errors.institution_name}
+                  onSearch={setInstitutionSearch}
+                  isLoading={isLoadingInstitutions}
+                  clearable
+                />
+              </div>
 
-              {/* Link to enter custom programme if none selected */}
+              {/* Link to enter custom programme */}
               {!watch("programme_id") && !showCustomProgrammeInput && (
                 <div className="flex items-center mt-1 col-span-1">
                   <button
@@ -358,8 +430,9 @@ const MultiStepForm: React.FC = () => {
                 </div>
               )}
 
+              {/* Link to enter custom institution */}
               {!watch("institution_id") && !showCustomInstitutionInput && (
-                <div className="flex items-center mt-1">
+                <div className="flex items-center mt-1 col-span-1">
                   <button
                     type="button"
                     className="text-blue-700 text-sm hover:underline"
@@ -370,33 +443,27 @@ const MultiStepForm: React.FC = () => {
                 </div>
               )}
 
-              {/* Custom institution input */}
-              {showCustomInstitutionInput && !watch("institution_id") && (
+              {/* Custom Programme Input */}
+              {showCustomProgrammeInput && !watch("programme_id") && (
                 <div className="col-span-full">
                   <Input
-                    label="Enter Institution Name(if not selecting from list)"
-                    register={register("institution_name", {
-                      required:
-                        "Please enter institution name if not selecting from list",
-                    })}
-                    error={errors.institution_name}
-                    placeholder="Enter your institution name"
+                    label="Enter Programme Name (if not selecting from list)"
+                    register={register("programme_name")}
+                    error={errors.programme_name}
+                    placeholder="Enter your programme name"
                     className="h-10"
                   />
                 </div>
               )}
 
-              {/* Custom programme input */}
-              {showCustomProgrammeInput && !watch("programme_id") && (
+              {/* Custom Institution Input */}
+              {showCustomInstitutionInput && !watch("institution_id") && (
                 <div className="col-span-full">
                   <Input
-                    label="Enter Programme Name (if not selecting from list)"
-                    register={register("programme_name", {
-                      required:
-                        "Please enter programme name if not selecting from list",
-                    })}
-                    error={errors.programme_name}
-                    placeholder="Enter your programme name"
+                    label="Enter Institution Name (if not selecting from list)"
+                    register={register("institution_name")}
+                    error={errors.institution_name}
+                    placeholder="Enter your institution name"
                     className="h-10"
                   />
                 </div>
