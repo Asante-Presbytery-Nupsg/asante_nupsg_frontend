@@ -149,6 +149,17 @@ export const useUserColumns = () => {
         ),
       },
       {
+        accessorKey: "residence",
+        header: "Residence",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2 font-medium">
+            <span className="truncate max-w-[20ch] text-nowrap">
+              {row.getValue("residence") ? row.getValue("residence") : "NULL"}
+            </span>
+          </div>
+        ),
+      },
+      {
         accessorKey: "congregation",
         header: "Congregation",
         cell: ({ row }) => (
