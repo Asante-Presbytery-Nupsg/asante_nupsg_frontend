@@ -76,10 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         localStorage.setItem("accessToken", accessToken);
 
-        // Fetch current admin profile
         const res = await BASE_API.get("/auth/admin/me");
-
-        // Critical fix: extract the actual user from res.data.data
         const userData = res.data?.data;
 
         if (!userData || !userData.role) {
