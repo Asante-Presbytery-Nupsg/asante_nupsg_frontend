@@ -104,6 +104,7 @@ const DashHome = () => {
         Programme: user.programme_name || "",
         Institution: user.institution_name || "",
         "High School": user.high_school || "",
+        Residence: user.residence || "",
         Congregation: user.congregation || "",
         Region: user.region_name || "",
         "Church District": user.district_church || "",

@@ -2,7 +2,7 @@ import useAuth from "@/hooks/useAuth";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { AxiosError } from "axios";
-import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
+import { Link, useNavigate } from "react-router-dom";
 
 interface LoginFormInputs {
   email: string;
@@ -12,13 +12,14 @@ interface LoginFormInputs {
 
 const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = useForm<LoginFormInputs>({
     defaultValues: { email: "", password: "", rememberMe: false },
   });
@@ -27,16 +28,20 @@ const Login = () => {
     setErrorMessage("");
     try {
       await login(data.email, data.password, data.rememberMe);
-      // Redirect only on success — this runs in a mounted component, so it works reliably
+
+      reset();
       navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
+      // Error occurred - stay on page and show error
       if (err instanceof AxiosError) {
-        setErrorMessage(err.response?.data?.message || "Invalid credentials.");
+        const message = err.response?.data?.message || "Invalid credentials.";
+        setErrorMessage(message);
       } else {
         setErrorMessage(
           err instanceof Error ? err.message : "An unexpected error occurred."
         );
       }
+      // Don't reset form on error so user can correct their input
     }
   };
 
@@ -58,6 +63,7 @@ const Login = () => {
               type="email"
               {...register("email", { required: "Email is required" })}
               className="border border-gray-300 rounded-xs p-1.5 w-full"
+              disabled={isSubmitting}
             />
           </div>
           <div>
@@ -68,6 +74,7 @@ const Login = () => {
               type="password"
               {...register("password", { required: "Password is required" })}
               className="border border-gray-300 rounded-xs p-1.5 w-full"
+              disabled={isSubmitting}
             />
           </div>
           <div className="flex items-center justify-between">
@@ -76,6 +83,7 @@ const Login = () => {
                 type="checkbox"
                 {...register("rememberMe")}
                 className="mr-2 h-4 w-4"
+                disabled={isSubmitting}
               />{" "}
               Remember Me
             </label>

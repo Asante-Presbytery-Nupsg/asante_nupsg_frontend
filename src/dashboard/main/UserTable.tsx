@@ -23,7 +23,6 @@ type UserTableProps = {
   onInstitutionChange: (institutionId: string | undefined) => void;
   onPresbyteryChange: (presbyteryId: string | undefined) => void;
 
-  /** ✅ async-safe */
   allInstitutions?: Array<{ id: string; name: string }>;
   allPresbyteries?: Array<{ id: string; name: string }>;
 
@@ -48,8 +47,8 @@ export function UserTable({
   onInstitutionChange,
   onPresbyteryChange,
 
-  allInstitutions = [], // ✅ default
-  allPresbyteries = [], // ✅ default
+  allInstitutions = [],
+  allPresbyteries = [],
 
   onExport,
   onInstitutionSearch,
@@ -79,6 +78,7 @@ export function UserTable({
             presbytery_name: true,
             whatsapp: false,
             dob: false,
+            residence: false,
             guardian_name: false,
             guardian_contact: false,
             other_name: false,
