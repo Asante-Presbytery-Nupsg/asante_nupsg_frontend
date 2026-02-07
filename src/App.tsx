@@ -5,11 +5,24 @@ import Home from "./pages/Home/Home";
 import MultiStepForm from "./pages/Forms/MultiStepForm";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import DashLayout from "./dashboard/layouts";
+import DashLayout from "./dashboard/layouts/index";
 import DashHome from "./dashboard/main/Home";
 import Login from "./auth/Login";
 import RequireAdmin from "./auth/RequireAuth";
 import { AuthProvider } from "./contexts/AuthProvider";
+
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import DashLayout from "./dashboard/layouts";
+import ShepherdSystemLayout from "./dashboard/shepherd-system/ShepherdSystemLayout";
+import DashboardOverview from "./dashboard/shepherd-system/DashboardOverview";
+import ShepherdList from "./dashboard/shepherd-system/ShepherdList";
+import ShepherdDetail from "./dashboard/shepherd-system/ShepherdDetail";
+import SheepList from "./dashboard/shepherd-system/SheepList";
+import SheepDetail from "./dashboard/shepherd-system/SheepDetail";
+import Reports from "./dashboard/shepherd-system/Reports";
+import CBList from "./dashboard/shepherd-system/CBList";
+import CBDetail from "./dashboard/shepherd-system/CBDetail";
+
 
 // Root component that provides AuthProvider for all routes
 function RootLayout() {
@@ -58,9 +71,25 @@ const router = createBrowserRouter([
         element: (
           <RequireAdmin>
             <DashLayout />
+            
           </RequireAdmin>
         ),
-        children: [{ index: true, element: <DashHome /> }],
+        children: [{ index: true, element: <DashHome /> },
+           {
+            path: "shepherd",
+            element: <ShepherdSystemLayout />,
+            children: [
+              { index: true, element: <DashboardOverview /> },
+              { path: "shepherds", element: <ShepherdList /> },
+              { path: "shepherds/:id", element: <ShepherdDetail /> },
+              { path: "sheep", element: <SheepList /> },
+              { path: "sheep/:id", element: <SheepDetail /> },
+              { path: "reports", element: <Reports /> },
+              { path: "cbs", element: <CBList /> },
+              { path: "cbs/:id", element: <CBDetail /> },
+            ],
+          },
+        ],
       },
     ],
   },

@@ -1,39 +1,37 @@
 import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
 import Logo from "../../assets/NUPSGLOGO.svg";
 
 const DashLayout = () => {
   return (
-    <div>
-      <header className="bg-gray-50/20 backdrop-blur-md py-4 border-b px-5 flex items-center justify-between sticky top-0 z-50 ">
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="NUPS-G Logo" className="w-6 sm:w-8" />
-          <div className="-space-y-1.5">
-            <h2 className="font-bold text-base sm:text-lg capitalize tracking-wider text-gray-700">
-              Admin Panel
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Sponsored by His Grace
-            </p>
+    <div className="min-h-screen bg-gray-50">
+      <Sidebar />
+      <div className="md:ml-64 transition-all duration-300">
+        <header className="bg-white/80 backdrop-blur-md py-4 border-b px-8 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile toggle could go here */}
+            <img src={Logo} alt="NUPS-G Logo" className="w-6 sm:w-8" />
           </div>
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="h-9 w-9 border rounded-full bg-gray-100">
-            <img
-              src="/images/avatar.webp"
-              alt="avatar"
-              className="w-full h-full object-cover rounded-full"
-            />
+          <div className="flex-1"></div> {/* Spacer */}
+          <div className="flex gap-4 items-center">
+            <div className="hidden sm:block text-right">
+              <p className="font-semibold text-sm text-gray-700">Patron View</p>
+              <p className="text-xs text-gray-500 font-medium">Dashboard</p>
+            </div>
+            <div className="h-9 w-9 border rounded-full bg-gray-100 overflow-hidden">
+              <img
+                src="/images/avatar.webp"
+                alt="avatar"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
-          <div className="-space-y-0.5">
-            <p className="font-semibold text-sm text-gray-700">Hi Admin</p>
-            <p className="text-xs text-gray-500 font-medium">KNUST-CB</p>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main>
-        <Outlet />
-      </main>
+        <main className="p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
