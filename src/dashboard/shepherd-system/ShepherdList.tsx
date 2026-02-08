@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,25 +14,118 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockShepherds, mockBranches } from "./data/mockData";
-import { Search, Plus, User } from "lucide-react";
-// import { toast } from "sonner";
+import { Search, Plus, User, ArrowUpDown } from "lucide-react";
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getFilteredRowModel,
+    flexRender,
+    ColumnDef,
+} from "@tanstack/react-table";
+import type { Shepherd } from "./data/types";
 
 const ShepherdList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddOpen, setIsAddOpen] = useState(false);
-
-    const filteredShepherds = mockShepherds.filter((shepherd) =>
-        shepherd.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const [sorting, setSorting] = useState([{ id: "name", desc: false }]);
+    const [globalFilter, setGlobalFilter] = useState("");
 
     const handleAddShepherd = (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, this would be an API call
-        // For now, we simulate success
         setIsAddOpen(false);
-        // Using alert if toast isn't globally configured yet, or simple console
         alert("Shepherd added successfully! (Mock Action)");
     };
+
+    const columns = useMemo<ColumnDef<Shepherd>[]>(
+        () => [
+            {
+                id: "shepherd",
+                header: "Shepherd",
+                accessorKey: "name",
+                cell: ({ row }) => (
+                    <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 shadow-inner border border-blue-200">
+                            <span className="font-bold text-sm">{row.original.name.charAt(0)}</span>
+                        </div>
+                        <div>
+                            <div className="font-semibold text-gray-900">{row.original.name}</div>
+                            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mt-1">
+                                {row.original.assignedSheepIds.length} Sheep Assigned
+                            </div>
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                id: "contact",
+                header: "Contact Info",
+                cell: ({ row }) => (
+                    <div className="space-y-1">
+                        <div className="text-sm text-gray-700">{row.original.contact}</div>
+                        <div className="text-xs text-gray-500">{row.original.email}</div>
+                    </div>
+                ),
+            },
+            {
+                id: "branch",
+                header: "Branch",
+                accessorKey: "branchId",
+                cell: ({ row }) => (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                        CB-{row.original.branchId.split('-')[1]}
+                    </span>
+                ),
+            },
+            {
+                id: "status",
+                header: "Role",
+                cell: () => (
+                    <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
+                        <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
+                        Active
+                    </span>
+                ),
+            },
+            {
+                id: "actions",
+                header: () => <div className="text-right">Actions</div>,
+                cell: ({ row }) => (
+                    <div className="text-right">
+                        <Link
+                            to={row.original.id}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
+                        >
+                            View Details
+                        </Link>
+                    </div>
+                ),
+            },
+        ],
+        []
+    );
+
+    const filteredData = useMemo(() => {
+        return mockShepherds.filter((shepherd) =>
+            shepherd.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            shepherd.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            shepherd.contact.includes(searchTerm)
+        );
+    }, [searchTerm]);
+
+    const table = useReactTable({
+        data: filteredData,
+        columns,
+        state: {
+            sorting,
+            globalFilter,
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setGlobalFilter,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+    });
 
     return (
         <div className="space-y-6">
@@ -106,61 +199,39 @@ const ShepherdList = () => {
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b-gray-100">
-                            <TableHead className="font-semibold text-gray-600">Shepherd</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Contact Info</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Branch</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Role</TableHead>
-                            <TableHead className="text-right font-semibold text-gray-600">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredShepherds.map((shepherd) => (
-                            <TableRow key={shepherd.id} className="hover:bg-blue-50/30 transition-colors">
-                                <TableCell className="py-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 shadow-inner border border-blue-200">
-                                            <span className="font-bold text-sm">{shepherd.name.charAt(0)}</span>
-                                        </div>
-                                        <div>
-                                            <div className="font-semibold text-gray-900">{shepherd.name}</div>
-                                            <div className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mt-1">
-                                                {shepherd.assignedSheepIds.length} Sheep Assigned
-                                            </div>
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="space-y-1">
-                                        <div className="text-sm text-gray-700">{shepherd.contact}</div>
-                                        <div className="text-xs text-gray-500">{shepherd.email}</div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                                        {/* Mock branch retrieval - normally handled by a robust store */}
-                                        CB-{shepherd.branchId.split('-')[1]}
-                                    </span>
-                                </TableCell>
-                                <TableCell>
-                                    <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
-                                        Active
-                                    </span>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Link
-                                        to={shepherd.id}
-                                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className="bg-gray-50/50 hover:bg-gray-50/50 border-b-gray-100">
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                        key={header.id}
+                                        className="font-semibold text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={header.column.getToggleSortingHandler()}
                                     >
-                                        View Details
-                                    </Link>
-                                </TableCell>
+                                        <div className="flex items-center gap-2">
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.column.getCanSort() && (
+                                                <ArrowUpDown className="h-4 w-4 opacity-50" />
+                                            )}
+                                        </div>
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
-                        {filteredShepherds.length === 0 && (
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length > 0 ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className="hover:bg-blue-50/30 transition-colors">
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="py-4">
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-32 text-center text-gray-500">
+                                <TableCell colSpan={columns.length} className="h-32 text-center text-gray-500">
                                     <div className="flex flex-col items-center gap-2">
                                         <User className="h-8 w-8 text-gray-300" />
                                         <p>No shepherds found matching "{searchTerm}"</p>

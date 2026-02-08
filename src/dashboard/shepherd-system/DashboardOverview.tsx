@@ -25,21 +25,21 @@ const DashboardOverview: React.FC = () => {
     const totalReports = mockReports.length;
     const totalBranches = mockBranches.length;
 
-    const [simShepherd, setSimShepherd] = useState("");
-    const [simSheep, setSimSheep] = useState("");
+    // const [simShepherd, setSimShepherd] = useState("");
+    // const [simSheep, setSimSheep] = useState("");
 
-    const handleSimulateShepherd = () => {
-        if (simShepherd) navigate(`/dashboard/shepherd/shepherds/${simShepherd}`);
-    };
+    // const handleSimulateShepherd = () => {
+    //     if (simShepherd) navigate(`/dashboard/shepherd/shepherds/${simShepherd}`);
+    // };
 
-    const handleSimulateSheep = () => {
-        if (simSheep) navigate(`/dashboard/shepherd/sheep/${simSheep}`);
-    };
+    // const handleSimulateSheep = () => {
+    //     if (simSheep) navigate(`/dashboard/shepherd/sheep/${simSheep}`);
+    // };
 
     return (
         <div className="grid gap-6">
             {/* Simulation / Info Banner */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h3 className="text-blue-900 font-semibold flex items-center gap-2">
                         <Eye className="h-4 w-4" /> Simulate User Perspective
@@ -76,7 +76,7 @@ const DashboardOverview: React.FC = () => {
                         <Button variant="outline" className="bg-white text-blue-700 border-blue-200 hover:bg-blue-100" onClick={handleSimulateSheep}>Go</Button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Stats Cards - Clickable */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

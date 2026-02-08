@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { mockBranches } from "./data/mockData";
 import { Search, Building2, Users, UserCheck } from "lucide-react";
+import AddCBForm from "./AddCBForm";
 
 const CBList = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -21,7 +22,8 @@ const CBList = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold tracking-tight">Coordinating Branches</h2>
-                {/* <Button>Add Branch</Button> */}
+                <AddCBForm />
+                
             </div>
 
             <div className="flex items-center space-x-2 bg-white p-2 rounded-md border border-gray-200">

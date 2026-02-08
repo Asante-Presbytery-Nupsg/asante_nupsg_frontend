@@ -6,6 +6,14 @@ export interface CoordinatingBranch {
     totalReports: number;
 }
 
+export interface SubBranch {
+    id: string;
+    name: string;
+    parentBranchId: string;
+    location?: string;
+    contact?: string;
+}
+
 export interface Shepherd {
     id: string;
     name: string;

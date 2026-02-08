@@ -22,6 +22,7 @@ import SheepDetail from "./dashboard/shepherd-system/SheepDetail";
 import Reports from "./dashboard/shepherd-system/Reports";
 import CBList from "./dashboard/shepherd-system/CBList";
 import CBDetail from "./dashboard/shepherd-system/CBDetail";
+import SubBranchDetail from "./dashboard/shepherd-system/SubBranchDetail";
 
 
 // Root component that provides AuthProvider for all routes
@@ -86,7 +87,8 @@ const router = createBrowserRouter([
               { path: "sheep/:id", element: <SheepDetail /> },
               { path: "reports", element: <Reports /> },
               { path: "cbs", element: <CBList /> },
-              { path: "cbs/:id", element: <CBDetail /> },
+              { path: "cbs/:cbId", element: <CBDetail /> },
+              { path: "cbs/:cbId/sub-branches/:subBranchId", element: <SubBranchDetail /> },
             ],
           },
         ],

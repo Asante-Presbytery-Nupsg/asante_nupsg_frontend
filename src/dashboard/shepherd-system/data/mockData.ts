@@ -1,9 +1,15 @@
-import type { CoordinatingBranch, Shepherd, Sheep, Report } from "./types";
+import type { CoordinatingBranch, Shepherd, Sheep, Report, SubBranch } from "./types";
 
 export const mockBranches: CoordinatingBranch[] = [
     { id: "cb-1", name: "Legon", shepherdCount: 5, sheepCount: 30, totalReports: 120 },
     { id: "cb-2", name: "KNUST", shepherdCount: 8, sheepCount: 45, totalReports: 200 },
     { id: "cb-3", name: "UCC", shepherdCount: 4, sheepCount: 20, totalReports: 80 },
+];
+
+export const mockSubBranches: SubBranch[] = [
+    { id: "sub-1", name: "Pre Sec Legon", parentBranchId: "cb-1", location: "North Campus", contact: "0201111111" },
+    { id: "sub-2", name: "City Campus", parentBranchId: "cb-1", location: "South Campus", contact: "0201111112" },
+    { id: "sub-3", name: "KNUST SHS", parentBranchId: "cb-2", location: "Main Campus", contact: "0202222222" },
 ];
 
 export const mockShepherds: Shepherd[] = [

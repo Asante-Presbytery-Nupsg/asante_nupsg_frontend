@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,19 +14,22 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { mockSheep, mockShepherds } from "./data/mockData";
-import { Search, Plus, User, Filter } from "lucide-react";
+import { Search, Plus, User, Filter, ArrowUpDown } from "lucide-react";
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getFilteredRowModel,
+    flexRender,
+    ColumnDef,
+} from "@tanstack/react-table";
+import type { Sheep } from "./data/types";
 
 const SheepList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [yearFilter, setYearFilter] = useState<string>("all");
     const [isAddOpen, setIsAddOpen] = useState(false);
-
-    const filteredSheep = mockSheep.filter((sheep) => {
-        const matchesSearch = sheep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            sheep.program.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesYear = yearFilter === "all" || (sheep.year?.toString() || "") === yearFilter;
-        return matchesSearch && matchesYear;
-    });
+    const [sorting, setSorting] = useState([{ id: "name", desc: false }]);
 
     const getShepherdName = (id: string) => {
         return mockShepherds.find(s => s.id === id)?.name || "Unknown";
@@ -37,6 +40,105 @@ const SheepList = () => {
         setIsAddOpen(false);
         alert("Sheep added successfully! (Mock Action)");
     };
+
+    const columns = useMemo<ColumnDef<Sheep>[]>(
+        () => [
+            {
+                id: "name",
+                header: "Sheep Name",
+                accessorKey: "name",
+                cell: ({ row }) => (
+                    <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-700 shadow-inner border border-green-200">
+                            <span className="font-bold text-sm">{row.original.name.charAt(0)}</span>
+                        </div>
+                        <div>
+                            <div className="font-semibold text-gray-900">{row.original.name}</div>
+                            <div className="text-xs text-gray-500">{row.original.program}</div>
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                id: "details",
+                header: "Details",
+                cell: ({ row }) => (
+                    <div className="space-y-1">
+                        <div className="text-sm text-gray-700 flex items-center gap-1.5">
+                            <span className="font-medium text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                                {row.original.year ? `YR ${row.original.year}` : 'N/A'}
+                            </span>
+                            <span>{row.original.residence}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">{row.original.contact}</div>
+                    </div>
+                ),
+            },
+            {
+                id: "shepherd",
+                header: "Assigned Shepherd",
+                cell: ({ row }) => (
+                    <Link
+                        to={`/dashboard/shepherd/shepherds/${row.original.shepherdId}`}
+                        className="inline-flex items-center gap-2 group"
+                    >
+                        <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-bold border border-blue-100">
+                            {getShepherdName(row.original.shepherdId).charAt(0)}
+                        </div>
+                        <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">
+                            {getShepherdName(row.original.shepherdId)}
+                        </span>
+                    </Link>
+                ),
+            },
+            {
+                id: "status",
+                header: "Status",
+                cell: () => (
+                    <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
+                        <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
+                        Active
+                    </span>
+                ),
+            },
+            {
+                id: "actions",
+                header: () => <div className="text-right">Actions</div>,
+                cell: ({ row }) => (
+                    <div className="text-right">
+                        <Link
+                            to={row.original.id}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
+                        >
+                            View Profile
+                        </Link>
+                    </div>
+                ),
+            },
+        ],
+        []
+    );
+
+    const filteredData = useMemo(() => {
+        return mockSheep.filter((sheep) => {
+            const matchesSearch = sheep.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                sheep.program.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesYear = yearFilter === "all" || (sheep.year?.toString() || "") === yearFilter;
+            return matchesSearch && matchesYear;
+        });
+    }, [searchTerm, yearFilter]);
+
+    const table = useReactTable({
+        data: filteredData,
+        columns,
+        state: {
+            sorting,
+        },
+        onSortingChange: setSorting,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+    });
 
     return (
         <div className="space-y-6">
@@ -147,71 +249,39 @@ const SheepList = () => {
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b-gray-100">
-                            <TableHead className="font-semibold text-gray-600">Sheep Name</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Details</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Assigned Shepherd</TableHead>
-                            <TableHead className="font-semibold text-gray-600">Status</TableHead>
-                            <TableHead className="text-right font-semibold text-gray-600">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredSheep.map((sheep) => (
-                            <TableRow key={sheep.id} className="hover:bg-blue-50/30 transition-colors">
-                                <TableCell className="py-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-700 shadow-inner border border-green-200">
-                                            <span className="font-bold text-sm">{sheep.name.charAt(0)}</span>
-                                        </div>
-                                        <div>
-                                            <div className="font-semibold text-gray-900">{sheep.name}</div>
-                                            <div className="text-xs text-gray-500">{sheep.program}</div>
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="space-y-1">
-                                        <div className="text-sm text-gray-700 flex items-center gap-1.5">
-                                            <span className="font-medium text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                                                {sheep.year ? `YR ${sheep.year}` : 'N/A'}
-                                            </span>
-                                            <span>{sheep.residence}</span>
-                                        </div>
-                                        <div className="text-xs text-gray-500">{sheep.contact}</div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Link
-                                        to={`/dashboard/shepherd/shepherds/${sheep.shepherdId}`}
-                                        className="inline-flex items-center gap-2 group"
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id} className="bg-gray-50/50 hover:bg-gray-50/50 border-b-gray-100">
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                        key={header.id}
+                                        className="font-semibold text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
+                                        onClick={header.column.getToggleSortingHandler()}
                                     >
-                                        <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 text-xs font-bold border border-blue-100">
-                                            {getShepherdName(sheep.shepherdId).charAt(0)}
+                                        <div className="flex items-center gap-2">
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.column.getCanSort() && (
+                                                <ArrowUpDown className="h-4 w-4 opacity-50" />
+                                            )}
                                         </div>
-                                        <span className="text-sm text-gray-700 group-hover:text-blue-600 transition-colors">
-                                            {getShepherdName(sheep.shepherdId)}
-                                        </span>
-                                    </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <span className="inline-flex items-center gap-1.5 text-sm text-gray-600">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
-                                        Active
-                                    </span>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Link
-                                        to={sheep.id}
-                                        className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-4"
-                                    >
-                                        View Profile
-                                    </Link>
-                                </TableCell>
+                                    </TableHead>
+                                ))}
                             </TableRow>
                         ))}
-                        {filteredSheep.length === 0 && (
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length > 0 ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className="hover:bg-blue-50/30 transition-colors">
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="py-4">
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-32 text-center text-gray-500">
+                                <TableCell colSpan={columns.length} className="h-32 text-center text-gray-500">
                                     <div className="flex flex-col items-center gap-2">
                                         <User className="h-8 w-8 text-gray-300" />
                                         <p>No sheep found.</p>
